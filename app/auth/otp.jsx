@@ -12,7 +12,7 @@ export default function SignIn() {
    const SignInData = {otp}
    
    const onSubmit = async () => {
-      const response = await axios.post('http:localhost:5000/user/verify-otp', SignInData, {});
+      const response = await axios.post('http://10.0.8.75:5000/user/verify-otp', SignInData, {});
       Alert.alert(response.data.msg);
       
       const success = response.data.success;

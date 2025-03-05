@@ -46,11 +46,19 @@ export default function FacultySignUpScreen() {
     const SignUpData = { name, email, password }
 
     try {
-      const response = await axios.post('http://localhost:5000/admin/signup', SignUpData);
-      Alert.alert(response.data.msg)
-      router.push('/auth/faculty-otp')
+      const response = await axios.post('http://10.0.8.75:5000/admin/signup', SignUpData);
+      console.log("hellouii");
+
+      Alert.alert('Success', response.data.msg || 'Signup successful!');
+      router.push('/auth/faculty-otp');
     } catch (error) {
-      Alert.alert("Signup Failed", error.response?.data?.msg || "Something went wrong");
+      let errorMessage = 'An error occurred. Please try again.';
+      if (error.response && error.response.data && typeof error.response.data.msg === 'string') {
+        errorMessage = error.response.data.msg;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      Alert.alert('Error', errorMessage);
     }
   }
 

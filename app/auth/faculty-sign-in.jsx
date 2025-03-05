@@ -14,8 +14,8 @@ export default function SignIn() {
    const SignInData = {email,password}
    
    const onSignInPress = async () => {
-      const response = await axios.post('http:localhost:5000/admin/signin', SignInData, {});
-      Alert.alert(response.msg);
+      const response = await axios.post('http:10.0.8.75:5000/admin/signin', SignInData, {});
+      Alert.alert(response.data.msg);
 
       const success = response.data.success
 

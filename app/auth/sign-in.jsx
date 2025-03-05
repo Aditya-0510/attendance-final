@@ -14,25 +14,26 @@ export default function SignIn() {
    const SignInData = {email,password}
    
    const onSignInPress = async () => {
-      const response = await axios.post('http:localhost:5000/user/signin', SignInData, {});
-      Alert.alert(response.msg);
+      const response = await axios.post('http:10.0.8.75:5000/user/signin', SignInData, {});
+      Alert.alert(response.data.msg);
 
       const success = response.data.success
 
+      console.log(success);
       if(success){
-
           const token = response.data.token;
           
-          const storeToken = async (token) => {
+          const storeToken = async (token,user) => {
               try {
                   await AsyncStorage.setItem('authToken', token);
+                  await AsyncStorage.setItem('user', user);
                   console.log('Token stored successfully!');
                 } catch (error) {
                     console.error('Error storing token:', error);
                 }
             };
             
-            storeToken(token);
+            storeToken(token,response.data.user);
             router.replace('(tabs)')
         }
 

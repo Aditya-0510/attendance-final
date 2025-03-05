@@ -29,9 +29,10 @@ export default function AddCourse() {
                 Alert.alert('Error', 'Authentication token missing.');
                 return;
             }
-
+            
+            console.log("hhfhfh")
             const response = await axios.post(
-                `http://localhost:5000/admin/add-course`,
+                `http://10.0.8.75:5000/admin/add-course`,
                 classDetails,
                 {
                     headers: {
@@ -56,7 +57,7 @@ export default function AddCourse() {
             <TextInput
                 style={styles.input}
                 placeholder="Course ID"
-                value={courseId}
+                value={coursecode}
                 onChangeText={setCourseId}
             />
             <TextInput

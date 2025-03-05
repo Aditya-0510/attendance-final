@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useRouter , Stack} from "expo-router";
 
 export default function CourseList() {
+    const router = useRouter();
     const [courseList, setCourseList] = useState([]);
 
     useEffect(() => {
@@ -28,13 +30,15 @@ export default function CourseList() {
                 return;
             }
 
-            const response = await axios.get('http://localhost:5000/admin/courses', {
+            const response = await axios.get('http://10.0.8.75:5000/admin/courses', {
                 headers: {
                     'token': token,
                 },
             });
 
-            if (response.data.isThere) {
+            console.log(response.data.courses)
+
+            if (response.data.isthere) {
                 setCourseList(response.data.courses);
             } else {
                 setCourseList([]);
@@ -76,11 +80,11 @@ const styles = StyleSheet.create({
     },
     courseItem: {
         backgroundColor: '#80B3FF',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
+        paddingVertical: 25,
+        paddingHorizontal: 15,
         borderRadius: 25,
         marginVertical: 5,
-        width: '80%',
+        width: '100%',
         alignItems: 'center',
     },
     courseText: {

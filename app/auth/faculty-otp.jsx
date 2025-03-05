@@ -12,10 +12,12 @@ export default function SignIn() {
    const SignInData = {otp}
    
    const onSubmit = async () => {
-      const response = await axios.post('http:localhost:5000/admin/verify-otp', SignInData, {});
+      console.log("jbwkjvckhsvckhvswkc")
+      const response = await axios.post('http:10.0.8.75:5000/admin/verify-otp', SignInData, {});
       Alert.alert(response.data.msg);
       
       const success = response.data.success;
+      console.log(success);
       if(success){
           router.push("/auth/faculty-sign-in")
       }

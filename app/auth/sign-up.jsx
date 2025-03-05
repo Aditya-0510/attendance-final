@@ -2,13 +2,14 @@ import * as React from 'react'
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native'
 import { useRouter, Stack } from 'expo-router'
 import Color from '../../constant/Color'
+import axios from 'axios'
 
 export default function SignUpScreen() {
   const router = useRouter()
 
   const [name, setName] = React.useState('')
   const [email, setEmailAddress] = React.useState('')
-  const [rollno, setrollno] = React.useState('')
+  const [roll, setrollno] = React.useState('')
   const [batch, setBatch] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [confirmPassword, setConfirmPassword] = React.useState('')
@@ -19,6 +20,7 @@ export default function SignUpScreen() {
   };
 
   const onSignUpPress = async () => {
+    
     if (!name.trim()) {
       Alert.alert('Error', 'Please enter your name')
       return
@@ -44,15 +46,24 @@ export default function SignUpScreen() {
       return
     }
 
-    const SignUpData = {name,rollno,email,password,batch}
+    const SignUpData = {name,roll,email,password,batch}
 
     try {
-      const response = await axios.post('http://localhost:5000/user/signup', SignUpData);
-      Alert.alert(response.data.msg)
-      router.push('/auth/otp')
+      const response = await axios.post('http://10.0.8.75:5000/user/signup', SignUpData);
+      console.log("hellouii");
+
+      Alert.alert('Success', response.data.msg || 'Signup successful!');
+      router.push('/auth/otp');
     } catch (error) {
-      Alert.alert("Signup Failed", error.response?.data?.msg || "Something went wrong");
+      let errorMessage = 'An error occurred. Please try again.';
+      if (error.response && error.response.data && typeof error.response.data.msg === 'string') {
+        errorMessage = error.response.data.msg;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      Alert.alert('Error', errorMessage);
     }
+    
   }
 
   return (
@@ -67,70 +78,77 @@ export default function SignUpScreen() {
         <Text style={styles.textHeader}>Sign Up</Text>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            placeholder="Enter name"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={setName}
-            autoCapitalize="words"
-          />
+        <TextInput
+  style={styles.textInput}
+  value={name}
+  placeholder="Enter name"
+  placeholderTextColor={Color.GRAY}
+  onChangeText={(text) => setName(String(text))}
+  autoCapitalize="words"
+/>
+
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={email}
-            placeholder="Enter email"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={setEmailAddress}
-            keyboardType="email-address"
-          />
+        <TextInput
+  style={styles.textInput}
+  autoCapitalize="none"
+  value={email}
+  placeholder="Enter email"
+  placeholderTextColor={Color.GRAY}
+  onChangeText={(text) => setEmailAddress(String(text))}
+  keyboardType="email-address"
+/>
+
+
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={rollno}
-            placeholder="Enter Roll number"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={setrollno}
-          />
+        <TextInput
+  style={styles.textInput}
+  autoCapitalize="none"
+  value={roll}
+  placeholder="Enter Roll number"
+  placeholderTextColor={Color.GRAY}
+  onChangeText={(text) => setrollno(String(text))}
+/>
+
+
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={batch}
-            placeholder="Enter Batch (CSE/ECE/DSAI)"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={setBatch}
-          />
+        <TextInput
+  style={styles.textInput}
+  autoCapitalize="none"
+  value={batch}
+  placeholder="Enter Batch (CSE/ECE/DSAI)"
+  placeholderTextColor={Color.GRAY}
+  onChangeText={(text) => setBatch(String(text))}
+/>
+
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={password}
-            placeholder="Enter password"
-            placeholderTextColor={Color.GRAY}
-            secureTextEntry={true}
-            onChangeText={setPassword}
-          />
+        <TextInput
+  style={styles.textInput}
+  value={password}
+  placeholder="Enter password"
+  placeholderTextColor={Color.GRAY}
+  secureTextEntry={true}
+  onChangeText={(text) => setPassword(String(text))}
+/>
+
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={confirmPassword}
-            placeholder="Confirm password"
-            placeholderTextColor={Color.GRAY}
-            secureTextEntry={true}
-            onChangeText={setConfirmPassword}
-          />
+        <TextInput
+  style={styles.textInput}
+  value={confirmPassword}
+  placeholder="Confirm password"
+  placeholderTextColor={Color.GRAY}
+  secureTextEntry={true}
+  onChangeText={(text) => setConfirmPassword(String(text))}
+/>
         </View>
 
         <View style={styles.buttonContainer}>
