@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useRouter , Stack} from "expo-router";
+import Header from "../../components/Fheader";
 
 export default function CourseList() {
     const router = useRouter();
@@ -50,6 +51,8 @@ export default function CourseList() {
     };
 
     return (
+        <>
+        <Header/>
         <View style={styles.container}>
             <FlatList
                 data={courseList}
@@ -68,6 +71,7 @@ export default function CourseList() {
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
         </View>
+        </>
     );
 }
 

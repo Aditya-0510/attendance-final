@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router'
+import Header from "../../components/Fheader"; 
 
 export default function AddCourse() {
       const router = useRouter()
@@ -52,6 +53,8 @@ export default function AddCourse() {
     };
 
     return (
+        <>
+        <Header/>
         <View style={styles.container}>
             <Text style={styles.header}>Adding a Course</Text>
             <TextInput
@@ -70,6 +73,7 @@ export default function AddCourse() {
                 <Text style={styles.buttonText}>Add Course</Text>
             </TouchableOpacity>
         </View>
+        </>
     );
 }
 
