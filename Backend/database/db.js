@@ -24,6 +24,7 @@ const admin= new Schema({
 })
 const currentclass=new Schema({
     Coursecode:String,
+    Title:String,
     Batch:String,
     Hours:Number,
     adminId:ObjectId,

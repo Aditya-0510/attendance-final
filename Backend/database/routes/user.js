@@ -1,4 +1,4 @@
-const {Router}=require('express');
+const {Router, response}=require('express');
 const jwt=require('jsonwebtoken');
 const bcrypt=require('bcrypt')
 const userRouter=Router();
@@ -59,7 +59,7 @@ userRouter.post('/verify-otp', async (req, res) => {
       await UserModel.create({
         email: userData.email,
         password: hashedPass,
-        name: userData.name,
+        Name: userData.name,
         rollno: userData.roll,
         Batch: userData.batch
       });
@@ -109,6 +109,21 @@ catch(e){
 
 })
 userRouter.use(auth_user);
+userRouter.get('/profile',async function(req,res){
+    const id=req.user.id
+    try{
+    const user=await UserModel.findOne({
+        _id:id
+    })
+    console.log(user);
+    res.send(user)
+}
+catch(e){
+    res.status(500).send({
+        msg:"internal server error"
+    })
+}
+})
 // userRouter.get('/getter',async function(req,res){
 //     const userid=req.user.id;
 //     try{
@@ -185,7 +200,7 @@ userRouter.post('/mark-attendance',async function(req,res){
     let hour=req.body.hour;
     let user=req.user.id;
     let ispresent=req.body.ispresent;
-    // console.log(hour);
+    console.log(hour);
     try{
         let course=await CourseModel.findOne({
             coursecode:coursecode
@@ -199,12 +214,12 @@ userRouter.post('/mark-attendance',async function(req,res){
             if(attendance){
             console.log(attendance.hours)
             let h=attendance.hours+hour;
-            await AttendanceModel.updateOne({
-                coursecode:id,
-                studentid:user
-            },{
-                hours:h
-            })
+            await AttendanceModel.updateOne(
+                { coursecode: id, studentid: user }, // Filter criteria
+                { $set: { hours: h } }, // Update operation using $set
+                { upsert: false } // Optional: prevents creating a new document if none match
+              );
+              
         }
         else{
             await AttendanceModel.create({

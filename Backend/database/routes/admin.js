@@ -62,7 +62,7 @@ adminRouter.post('/verify-otp', async (req, res) => {
       await AdminModel.create({
         email: userData.email,
         password: hashedPass,
-        name: userData.name,
+        Name: userData.name,
       });
   
       otpStore.delete(parseInt(otp)); // Remove OTP after use
@@ -133,36 +133,81 @@ catch(e){
 })
 
 adminRouter.use(auth_admin);
+adminRouter.get('/profile',async function(req,res){
+    const id=req.admin.id
+    try{
+    const admin=await AdminModel.findOne({
+        _id:id
+    })
+    console.log(admin);
+    res.send(admin)
+}
+catch(e){
+    res.status(500).send({
+        msg:"internal server error"
+    })
+}
+})
 
+adminRouter.get("/checker",async function(req,res){
+    const adminid=req.admin.id
+    try{
+        const clas=await CurrentclassModel.findOne({
+            adminId:adminid
+        })
+        if(clas){
+            res.send({
+                ongoing:true,
+                clas:clas
+            });
+        }
+        else{
+            res.send({
+                ongoing:false
+            })
+        }
+    }
+    catch(e){
+        res.status(500).send({
+            msg:"internal server error"
+        })
+    }
+})
 adminRouter.post('/start-class',async function(req,res){
     const coursecode=req.body.coursecode;
     const hours=req.body.hours;
     const batch=req.body.batch;
+    const title=req.body.title;
     const adminId=req.admin.id;
+    console.log(hours);
     try{
-    await CurrentclassModel.create({
-        Coursecode:coursecode,
-        Hours:hours,
-        adminId:adminId,
-        Batch:batch
-    })
-    const course=await CourseModel.findOne({
-        coursecode:coursecode,
-    })
-    const thour=course.total_hours;
-    thour=thour+hours
-    await CourseModel.updateOne({
-        coursecode:coursecode,
-    },{
-        total_hours:thour
-    })
+        await CurrentclassModel.create({
+            Coursecode:coursecode,
+            Hours:hours,
+            Title:title,
+            adminId:adminId,
+            Batch:batch
+        })
+        const course=await CourseModel.findOne({
+            coursecode:coursecode,
+        })
+        let thour=course.total_hours;
+        thour=thour+parseInt(hours)
+        console.log(hours);
+
+    const result = await CourseModel.updateOne(
+        { coursecode: coursecode }, // Find by coursecode
+        { $set: { total_hours: thour } } // Use $set to update the field
+      );
     res.send({
-        msg:"Class has been raised"
+        msg:"Class has been raised",
+        success:true
     })
 }
 catch(e){
     res.status(500).send({
-        msg:"Internal server error"
+        msg:"Internal server error",
+        success:false
     })
 }
 
