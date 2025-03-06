@@ -133,6 +133,7 @@ catch(e){
 })
 
 adminRouter.use(auth_admin);
+
 adminRouter.get('/profile',async function(req,res){
     const id=req.admin.id
     try{

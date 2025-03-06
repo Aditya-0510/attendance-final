@@ -5,6 +5,7 @@ const {Router}=require('express'); // both are same but this is oneliner to impo
 const {CourseModel}=require('../db')
 const courseRouter=Router();
 courseRouter.get("/preview",async function(req,res){
+    console.log("hiii")
     try{
     let cours=await CourseModel.find();
     res.send(cours);

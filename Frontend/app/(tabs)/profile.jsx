@@ -48,23 +48,10 @@ export default function MenuScreen() {
   const handleSignOut = async () => {
     try {
       await AsyncStorage.removeItem("authToken");
-      await AsyncStorage.removeItem("user");
       router.replace("/auth/userselect");
     } catch (error) {
       console.error("Error signing out:", error);
       Alert.alert("Error", "Failed to sign out.");
-    }
-  };
-
-  // Handle account change by clearing auth data and redirecting
-  const handleChangeAcc = async () => {
-    try {
-      await AsyncStorage.removeItem("authToken");
-      await AsyncStorage.removeItem("user");
-      router.replace("/auth/sign-in");
-    } catch (error) {
-      console.error("Error changing account:", error);
-      Alert.alert("Error", "Failed to switch accounts.");
     }
   };
 
@@ -85,7 +72,7 @@ export default function MenuScreen() {
             />
           </View>
           <Text style={styles.profileName}>{username}</Text>
-          <Text style={styles.profileRole}>{rollno}</Text>
+          <Text style={styles.profileRole}>{rollno} </Text>
         </View>
 
         <View style={styles.buttonsContainer}>
@@ -93,9 +80,6 @@ export default function MenuScreen() {
             <Text style={styles.buttonText}>Sign Out</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handleChangeAcc}>
-            <Text style={styles.buttonText}>Change Account</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>

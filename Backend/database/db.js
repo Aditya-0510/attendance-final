@@ -14,7 +14,7 @@ const user= new Schema({
 const attendance= new Schema({
     coursecode:ObjectId,
     hours:{type:Number,default:0},
-    studentid:ObjectId
+    studentid:ObjectId,
 })
 const admin= new Schema({
     email:{type:String,unique:true},

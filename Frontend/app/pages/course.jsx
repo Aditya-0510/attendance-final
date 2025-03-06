@@ -1,110 +1,116 @@
-import { StyleSheet, Text, View ,TouchableOpacity,FlatList} from 'react-native'
-import React from 'react'
-import { useRouter } from "expo-router";
-import { FontAwesome } from "@expo/vector-icons"; // Import Icon for Back Button
-import Header from "../../components/header"; 
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import Header from '../../components/header';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-export default function course() {
+export default function Course() {
+  const [courses, setCourses] = useState([]);
   const router = useRouter();
 
-  const courses = [
-    { id: "1", name: "Course Name", professor: "Prof. Name" },
-    { id: "2", name: "Course Name", professor: "Prof. Name" },
-    { id: "3", name: "Course Name", professor: "Prof. Name" },
-    { id: "4", name: "Course Name", professor: "Prof. Name" },
-    { id: "5", name: "Course Name", professor: "Prof. Name" },
-  ];
-  return (
-    <View>
-      <Header/>
-      {/* <TouchableOpacity
-  style={styles.backButton}
-  onPress={() => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.push("/"); // Fallback to home if no history
+  // Function to get auth token
+  const getToken = async () => {
+    try {
+      return await AsyncStorage.getItem('authToken');
+    } catch (error) {
+      console.error('Error retrieving token:', error);
+      return null;
     }
-  }}
->
-  <FontAwesome name="arrow-left" size={24} color="black" />
-</TouchableOpacity> */}
+  };
 
-<View style={styles.flatListContainer}>
-  <FlatList
-    data={courses}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item, index }) => (
-      <TouchableOpacity 
-        style={[styles.courseCard]}
-        onPress={()=>router.push("pages/courseAttendance")}
-      >
-        <Text style={styles.courseName}>{item.name}</Text>
-        <Text style={styles.professorName}>{item.professor}</Text>
-      </TouchableOpacity>
-    )}
-  />
-</View>
+  // Fetch courses from the backend
+  const fetchCourses = async () => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        Alert.alert('Error', 'Authentication token missing.');
+        return;
+      }
+      
+      const response = await axios.get('http://10.0.8.75:5000/courses/preview');
+      // console.log("hiii")
+      // console.log(response.data)
+
+      if (response.data) {
+        setCourses(response.data); 
+      } else {
+        // console.warn('Unexpected response structure:', response.data);
+      }
+
+      // console.log(courses)
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      Alert.alert('Error', 'Failed to load courses.');
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  // useEffect(() => {
+  //   console.log('Updated courses:', courses); // Ensure re-renders happen
+  // }, [courses]);
+
+  return (
+    <View style={styles.container}>
+      <Header />
+
+      <View style={styles.flatListContainer}>
+        <FlatList
+          data={courses}
+          keyExtractor={(item) => item._id} 
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.courseCard}
+              onPress={() =>
+                router.push({
+                  pathname: 'pages/courseAttendance',
+                  params: { coursecode: item.coursecode, title: item.title }
+                })
+              }
+              
+
+            >
+              <Text style={styles.professorName}>{item.coursecode || 'No Course Code'}</Text>
+              <Text style={styles.courseName}>{item.title || 'No title'}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#ffffff",
-  },
-  backButton: {
-    position: "absolute",
-    top: 25, // Adjust for better visibility
-    left: 20,
-    // backgroundColor: "#1E73E8",
-    padding: 10,
-    borderRadius: 10, // Makes it circular
-    elevation: 5,
-    zIndex: 10, // Ensures it stays above everything
+    padding: 20,
+    backgroundColor: '#ffffff',
   },
   flatListContainer: {
-    marginTop: 40, // Adjust this value as needed
-  },
-  
-  text: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#ffffff",
+    marginTop: 40,
+    marginBottom:50
   },
   courseCard: {
-    width: "90%", // Adjust width as needed
-    alignSelf: "center", // Center the card
-    backgroundColor: "#7DA3C3",
+    width: '90%',
+    alignSelf: 'center',
+    backgroundColor: '#7DA3C3',
     padding: 15,
     marginVertical: 5,
-    borderRadius: 5, // Less rounded corners for boxy look
-    borderWidth: 2, // Add a border
-    borderColor: "#00509E", // Darker border for contrast
-    shadowColor: "#000",
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#00509E',
+    shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
-    elevation: 5, // For Android shadow
-  },
-  
-  
-  selectedCard: {
-    borderWidth: 3,
-    borderColor: "#0066FF",
+    elevation: 5,
   },
   courseName: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   professorName: {
     fontSize: 14,

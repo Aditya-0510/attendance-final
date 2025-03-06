@@ -17,7 +17,7 @@ const app = express();
 app.use(express.json());
 
 app.use('/user',userRouter);
-app.use('/course',courseRouter); // better convention or way to route the requests 
+app.use('/courses',courseRouter); // better convention or way to route the requests 
 app.use('/admin',adminRouter);
 
 // createUserRoutes(app);

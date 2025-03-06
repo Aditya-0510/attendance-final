@@ -60,7 +60,6 @@ export default function CourseList() {
                 renderItem={({ item }) => (
                     <TouchableOpacity 
                         style={styles.courseItem}
-                        onPress={()=>router.push("pages/courseAttendance")}
                     >
                         <Text style={styles.courseText}>{item.title}</Text>
                         <Text style={styles.courseText}>{item.coursecode}</Text>
