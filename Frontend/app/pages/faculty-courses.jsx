@@ -58,12 +58,12 @@ export default function CourseList() {
                 data={courseList}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
-                    <TouchableOpacity 
+                    <View
                         style={styles.courseItem}
                     >
                         <Text style={styles.courseText}>{item.title}</Text>
                         <Text style={styles.courseText}>{item.coursecode}</Text>
-                    </TouchableOpacity>
+                    </View>
                 )}
             />
             <TouchableOpacity style={styles.addButton} onPress={() => router.push("pages/add-course")}>
@@ -82,10 +82,10 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     courseItem: {
-        backgroundColor: '#80B3FF',
+        backgroundColor: '#f4f4f4',
         paddingVertical: 25,
         paddingHorizontal: 15,
-        borderRadius: 25,
+        borderRadius: 5,
         marginVertical: 5,
         width: '100%',
         alignItems: 'center',
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         fontStyle: 'italic',
+        color:'#000000'
     },
     addButton: {
         marginTop: 20,

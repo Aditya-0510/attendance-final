@@ -4,7 +4,7 @@ const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken');
 const {auth_admin}=require('../middlewares/admin')
 require('dotenv').config();
-const {AdminModel,CourseModel, CurrentclassModel}=require("../db");
+const {AdminModel,CourseModel, CurrentclassModel, AttendanceModel, UserModel}=require("../db");
 
 
 const nodemailer = require('nodemailer');
@@ -133,7 +133,40 @@ catch(e){
 })
 
 adminRouter.use(auth_admin);
-
+adminRouter.get('/get-all',async function(req,res){
+    const coursecode=req.query.coursecode;
+    try{
+        const course=await CourseModel.findOne({
+            coursecode:coursecode
+        })
+        const courseid=course._id
+        const totalhours=course.total_hours
+        const users=await AttendanceModel.find({
+            coursecode:courseid
+        })
+        let data=[];
+        for(let i=0;i<users.length;i++){
+            let hour_attended=users[i].hours
+            const user=await UserModel.findOne({
+                _id:users[i].studentid
+            })
+            const rollno=user.rollno;
+            let percentage=(hour_attended/totalhours)*100;
+            data.push({
+                rollno:rollno,
+                percentage:percentage
+            })
+        }
+        console.log(data);
+        res.send(data);
+    }
+    catch(e){
+        return res.status(500).send({
+            msg:"Internal server error"
+        })
+    }
+    
+})
 adminRouter.get('/profile',async function(req,res){
     const id=req.admin.id
     try{

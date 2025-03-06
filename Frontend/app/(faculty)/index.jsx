@@ -19,7 +19,7 @@ export default function Index() {
             <Text style={styles.buttonText}>Current class</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={()=>router.push("pages/report")}>
+          <TouchableOpacity style={styles.button} onPress={()=>router.push("pages/course-select-report")}>
             <Text style={styles.buttonText}>Attendance Report</Text>
           </TouchableOpacity>
 
