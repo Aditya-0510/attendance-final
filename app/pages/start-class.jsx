@@ -1,16 +1,7 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TouchableOpacity, 
-  Modal, 
-  FlatList, 
-  SafeAreaView,
-  Alert  
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet,Text,View,TouchableOpacity,Modal,FlatList,SafeAreaView,Alert,ActivityIndicator } from 'react-native';
 import Header from "../../components/header"; 
-import { useRouter} from "expo-router";
+import { useRouter } from "expo-router";
 import axios from 'axios';
 
 export default function ClassDetails() {
@@ -22,46 +13,48 @@ export default function ClassDetails() {
         id: null
     });
     const [selectedHours, setSelectedHours] = useState('No. of Hours');
-
-    const courses = [
-        { id: 'SE001', name: 'Software Engineering' },
-        { id: 'DBMS002', name: 'Database Management System' },
-        { id: 'OS003', name: 'Operating Systems' },
-        { id: 'TOC004', name: 'Theory of Computation' },
-        { id: 'LA005', name: 'Linear Algebra' },
-        { id: 'ETH006', name: 'Ethics' }
-    ];
+    const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const hours = ['1 - Tutorial', '1.5 - Class', '2 - Lab'];
 
+    // Fetch courses from backend
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const response = await axios.get('http://10.0.8.75:5000/admin/courses');
+                setCourses(response.data.courses);
+            } catch (err) {
+                console.error("Error fetching courses:", err);
+                setError("Failed to load courses. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, []);
+
     const handleStartClass = async () => {
-        // Validate selections
         if (selectedCourse.name === 'Select Course' || selectedHours === 'No. of Hours') {
-            Alert.alert(
-                "Incomplete Selection",
-                "Please select a course and hours before starting the class"
-            );
+            Alert.alert("Incomplete Selection", "Please select a course and hours before starting the class");
             return;
         }
 
         try {
-            // Prepare data to send to backend
             const classData = {
                 courseId: selectedCourse.id,
                 courseName: selectedCourse.name,
                 hours: selectedHours,
                 date: new Date().toISOString()
             };
-    
-            // Send data to backend
-            const response = await axios.post('YOUR_BACKEND_ENDPOINT/start-class', classData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+
+            const response = await axios.post('http://10.0.8.75:5000/admin/start-class', classData, {
+                headers: { 'Content-Type': 'application/json' }
             });
 
             if (response.data.success) {
-                // Navigate to current class screen
                 router.push({
                     pathname: "/faculty/current-class",
                     params: {
@@ -71,19 +64,11 @@ export default function ClassDetails() {
                     }
                 });
             } else {
-                // Handle any specific error from backend
-                Alert.alert(
-                    "Start Class Failed",
-                    response.data.message || "Unable to start class"
-                );
+                Alert.alert("Start Class Failed", response.data.message || "Unable to start class");
             }
         } catch (error) {
-            // Handle network or axios errors
             console.error('Start Class Error:', error);
-            Alert.alert(
-                "Error",
-                error.response?.data?.message || "Network error. Please try again."
-            );
+            Alert.alert("Error", error.response?.data?.message || "Network error. Please try again.");
         }
     };
 
@@ -91,10 +76,7 @@ export default function ClassDetails() {
         <TouchableOpacity 
             style={styles.modalItem}
             onPress={() => {
-                setSelectedCourse({
-                    id: item.id,
-                    name: item.name
-                });
+                setSelectedCourse({ id: item.id, name: item.name });
                 setCourseModalVisible(false);
             }}
         >
@@ -102,107 +84,98 @@ export default function ClassDetails() {
         </TouchableOpacity>
     );
 
-  const renderHoursItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.modalItem}
-      onPress={() => {
-        setSelectedHours(item);
-        setHoursModalVisible(false);
-      }}
-    >
-      <Text style={styles.modalItemText}>{item}</Text>
-    </TouchableOpacity>
-  );
+    const renderHoursItem = ({ item }) => (
+        <TouchableOpacity 
+            style={styles.modalItem}
+            onPress={() => {
+                setSelectedHours(item);
+                setHoursModalVisible(false);
+            }}
+        >
+            <Text style={styles.modalItemText}>{item}</Text>
+        </TouchableOpacity>
+    );
 
-  return (
-    <>
-    <Header/>
-    
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Class Details</Text>
+    return (
+        <>
+        <Header/>
+        
+        <SafeAreaView style={styles.container}>
+            <Text style={styles.title}>Class Details</Text>
 
-      {/* Course Dropdown */}
-      <TouchableOpacity 
-        style={styles.dropdown}
-        onPress={() => setCourseModalVisible(true)}
-      >
-        <Text style={styles.dropdownText}>{selectedCourse.name}</Text>
-        <Text style={styles.dropdownIcon}>▼</Text>
-      </TouchableOpacity>
+            {/* Course Dropdown */}
+            <TouchableOpacity 
+                style={styles.dropdown}
+                onPress={() => setCourseModalVisible(true)}
+                disabled={loading}
+            >
+                {loading ? (
+                    <ActivityIndicator size="small" color="#000" />
+                ) : (
+                    <Text style={styles.dropdownText}>{selectedCourse.name}</Text>
+                )}
+                <Text style={styles.dropdownIcon}>▼</Text>
+            </TouchableOpacity>
 
-      {/* Hours Dropdown */}
-      <TouchableOpacity 
-        style={styles.dropdown}
-        onPress={() => setHoursModalVisible(true)}
-      >
-        <Text style={styles.dropdownText}>{selectedHours}</Text>
-        <Text style={styles.dropdownIcon}>▼</Text>
-      </TouchableOpacity>
+            {/* Hours Dropdown */}
+            <TouchableOpacity 
+                style={styles.dropdown}
+                onPress={() => setHoursModalVisible(true)}
+            >
+                <Text style={styles.dropdownText}>{selectedHours}</Text>
+                <Text style={styles.dropdownIcon}>▼</Text>
+            </TouchableOpacity>
 
-      {/* Start Button */}
-      <TouchableOpacity 
-        style={styles.startButton}
-        // onPress={() => {
-        //     // Check if both course and hours are selected
-        //     if (selectedCourse !== 'Select Course' && selectedHours !== 'No. of Hours') {
-        //       router.push({
-        //         pathname: "/faculty/current-class",
-        //         params: {
-        //           courseName: selectedCourse,
-        //           hours: selectedHours
-        //         }
-        //       });
-        //     } else {
-        //       // Optional: Add an alert or toast to inform user to select course and hours
-        //       Alert.alert(
-        //         "Selection Required", 
-        //         "Please select a course and hours before starting the class"
-        //       );
-        //     }
-        //   }}
-        onPress={handleStartClass}
-      >
-        <Text style={styles.startButtonText}>Start</Text>
-      </TouchableOpacity>
+            {/* Start Button */}
+            <TouchableOpacity 
+                style={styles.startButton}
+                onPress={handleStartClass}
+            >
+                <Text style={styles.startButtonText}>Start</Text>
+            </TouchableOpacity>
 
-      {/* Course Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={courseModalVisible}
-        onRequestClose={() => setCourseModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <FlatList
-              data={courses}
-              renderItem={renderCourseItem}
-              keyExtractor={(item) => item.id}
-            />
-          </View>
-        </View>
-      </Modal>
+            {/* Course Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={courseModalVisible}
+                onRequestClose={() => setCourseModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        {error ? (
+                            <Text style={{ textAlign: 'center', color: 'red' }}>{error}</Text>
+                        ) : (
+                            <FlatList
+                                data={courses}
+                                renderItem={renderCourseItem}
+                                keyExtractor={(item) => item.id}
+                            />
+                        )}
+                    </View>
+                </View>
+            </Modal>
 
-      {/* Hours Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={hoursModalVisible}
-        onRequestClose={() => setHoursModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <FlatList
-              data={hours}
-              renderItem={renderHoursItem}
-              keyExtractor={(item) => item}
-            />
-          </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
-    </>
-  );
+            {/* Hours Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={hoursModalVisible}
+                onRequestClose={() => setHoursModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <FlatList
+                            data={hours}
+                            renderItem={renderHoursItem}
+                            keyExtractor={(item) => item}
+                        />
+                    </View>
+                </View>
+            </Modal>
+        </SafeAreaView>
+        </>
+    );
 }
 
 const styles = StyleSheet.create({
