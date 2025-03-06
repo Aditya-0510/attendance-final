@@ -23,17 +23,17 @@ export default function SignIn() {
       if(success){
           const token = response.data.token;
           
-          const storeToken = async (token,user) => {
+          const storeToken = async (token) => {
               try {
                   await AsyncStorage.setItem('authToken', token);
-                  await AsyncStorage.setItem('user', user);
+                  // await AsyncStorage.setItem('user', user);
                   console.log('Token stored successfully!');
                 } catch (error) {
                     console.error('Error storing token:', error);
                 }
             };
             
-            storeToken(token,response.data.user);
+            storeToken(token);
             router.replace('(tabs)')
         }
 

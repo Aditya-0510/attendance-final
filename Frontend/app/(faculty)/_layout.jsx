@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {Tabs} from 'expo-router'
 import Entypo from '@expo/vector-icons/Entypo';
-import FontAwesome from '@expo/vector-icons/FontAwesome'; 
 
 export default function TabLayout() {
 
@@ -17,7 +16,7 @@ export default function TabLayout() {
                 )
             }}
         />
-        <Tabs.Screen name="menu" 
+        <Tabs.Screen name="profile" 
             options={{
                 tabBarLabel:"Profile",
                 tabBarIcon:({color,size}) =>(

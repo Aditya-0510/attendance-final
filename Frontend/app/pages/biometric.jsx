@@ -2,6 +2,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Image, Platform, Alert } from
 import React, { useEffect, useState } from "react";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios'
 
 export default function Verification() {
   const [isBiometricSupported, setIsBiometricSupported] = useState(null);
@@ -9,7 +11,18 @@ export default function Verification() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isVerificationComplete, setIsVerificationComplete] = useState(false);
   const [showRecordedMessage, setShowRecordedMessage] = useState(false);
+  const [classDetails, setClassDetails] = useState(null);
   const router = useRouter();
+
+  const getToken = async () => {
+    try {
+        const token = await AsyncStorage.getItem('authToken');
+        return token;
+    } catch (error) {
+        console.error('Error retrieving token:', error);
+        return null;
+    }
+};
 
   useEffect(() => {
     checkBiometricSupport();
@@ -102,8 +115,49 @@ export default function Verification() {
 
       const result = await LocalAuthentication.authenticateAsync(authOptions);
       console.log('Authentication result:', result);
+      // console.log(result.success)
 
       if (result.success) {
+        const token = await getToken();
+        if (!token) {
+            Alert.alert('Error', 'Authentication token missing.');
+            return;
+        }
+        console.log("token"+token)
+        const response = await axios.get(
+          'http://10.0.8.75:5000/user/checker',
+          {
+              headers: {
+                  'token': token,
+              },
+          }
+      );
+
+      const classData = response.data.clas;
+      setClassDetails(classData); // Update classDetails state
+      console.log('Class details:', classData);
+
+      const newDetails = {
+        coursecode: classDetails.Coursecode,
+        hour: classDetails.Hours,
+        ispresent: result.success,
+      };
+      
+      console.log(newDetails)
+
+       await axios.post(
+        'http://10.0.8.75:5000/user/mark-attendance',
+        newDetails,
+        {
+            headers: {
+                'token': token,
+            },
+        }
+    );
+
+    
+
+
         console.log('Authentication successful');
         setIsAuthenticated(true);
         setIsVerificationComplete(true);

@@ -22,7 +22,7 @@ export default function index() {
             <View style={styles.buttonContainer1}>
               <TouchableOpacity 
                 style={styles.button1}
-                onPress={()=>router.push("pages/location")}
+                onPress={()=>router.push("pages/user-ongoing")}
               >
                 <Text style={styles.buttonText1}>Current Class</Text>
               </TouchableOpacity>
