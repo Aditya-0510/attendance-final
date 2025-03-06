@@ -1,23 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet,Text,View,TouchableOpacity,Modal,FlatList,SafeAreaView,Alert,ActivityIndicator } from 'react-native';
 import Header from "../../components/header"; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import axios from 'axios';
 
 export default function ClassDetails() {
+
+  const getToken = async () => {
+    try {
+        const token = await AsyncStorage.getItem('authToken');
+        return token;
+    } catch (error) {
+        console.error('Error retrieving token:', error);
+        return null;
+    }
+};
+
     const router = useRouter();
     const [courseModalVisible, setCourseModalVisible] = useState(false);
     const [hoursModalVisible, setHoursModalVisible] = useState(false);
+    const [batchModalVisible, setBatchModalVisible] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState({
         name: 'Select Course',
         id: null
     });
     const [selectedHours, setSelectedHours] = useState('No. of Hours');
+    const [selectedBatch, setBatch] = useState('Batch');
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const hours = ['1 - Tutorial', '1.5 - Class', '2 - Lab'];
+    const batch = ['CSE','ECE','DSAI']
 
     // Fetch courses from backend
     useEffect(() => {
@@ -43,15 +58,19 @@ export default function ClassDetails() {
         }
 
         try {
+          const token = await getToken();
+                      if (!token) {
+                          Alert.alert('Error', 'Authentication token missing.');
+                          return;
+                      }
             const classData = {
-                courseId: selectedCourse.id,
-                courseName: selectedCourse.name,
+                coursecode: selectedCourse.id,
+                batch : selectedBatch,
                 hours: selectedHours,
-                date: new Date().toISOString()
             };
 
             const response = await axios.post('http://10.0.8.75:5000/admin/start-class', classData, {
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'token': token }
             });
 
             if (response.data.success) {
@@ -96,6 +115,18 @@ export default function ClassDetails() {
         </TouchableOpacity>
     );
 
+    const renderBatchItem = ({ item }) => (
+        <TouchableOpacity 
+            style={styles.modalItem}
+            onPress={() => {
+                setBatch(item);
+                setBatchModalVisible(false);
+            }}
+        >
+            <Text style={styles.modalItemText}>{item}</Text>
+        </TouchableOpacity>
+    );
+
     return (
         <>
         <Header/>
@@ -126,6 +157,15 @@ export default function ClassDetails() {
                 <Text style={styles.dropdownIcon}>▼</Text>
             </TouchableOpacity>
 
+            {/* Batch Dropdown */}
+            <TouchableOpacity 
+                style={styles.dropdown}
+                onPress={() => setBatchModalVisible(true)}
+            >
+                <Text style={styles.dropdownText}>{selectedBatch}</Text>
+                <Text style={styles.dropdownIcon}>▼</Text>
+            </TouchableOpacity>
+
             {/* Start Button */}
             <TouchableOpacity 
                 style={styles.startButton}
@@ -147,7 +187,7 @@ export default function ClassDetails() {
                             <Text style={{ textAlign: 'center', color: 'red' }}>{error}</Text>
                         ) : (
                             <FlatList
-                                data={courses}
+                                data={courses.title}
                                 renderItem={renderCourseItem}
                                 keyExtractor={(item) => item.id}
                             />
@@ -168,6 +208,24 @@ export default function ClassDetails() {
                         <FlatList
                             data={hours}
                             renderItem={renderHoursItem}
+                            keyExtractor={(item) => item}
+                        />
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Batch Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={batchModalVisible}
+                onRequestClose={() => setBatchModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <FlatList
+                            data={batch}
+                            renderItem={renderBatchItem}
                             keyExtractor={(item) => item}
                         />
                     </View>
