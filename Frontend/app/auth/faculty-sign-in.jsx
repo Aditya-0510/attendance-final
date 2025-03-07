@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useRouter , Stack} from "expo-router";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { useRouter, Stack } from "expo-router";
 import React, { useState } from 'react';
 import Color from '../../constant/Color';
-import axios from 'axios'
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignIn() {
@@ -10,78 +10,91 @@ export default function SignIn() {
 
    const [email, setEmailAddress] = useState('');
    const [password, setPassword] = useState('');
+   const [isLoading, setIsLoading] = useState(false); 
 
-   const SignInData = {email,password}
+   const SignInData = { email, password };
    
    const onSignInPress = async () => {
-      const response = await axios.post('http:10.0.8.75:5000/admin/signin', SignInData, {});
-      Alert.alert(response.data.msg);
+      setIsLoading(true);
 
-      const success = response.data.success
+      try {
+         const response = await axios.post('http://10.0.8.75:5000/admin/signin', SignInData, {});
+         Alert.alert(response.data.msg);
 
-      if(success){
+         const success = response.data.success;
 
-          const token = response.data.token;
-          
-          const storeToken = async (token) => {
-              try {
+         if (success) {
+            const token = response.data.token;
+            
+            const storeToken = async (token) => {
+               try {
                   await AsyncStorage.setItem('authToken', token);
                   console.log('Token stored successfully!');
-                } catch (error) {
-                    console.error('Error storing token:', error);
-                }
+               } catch (error) {
+                  console.error('Error storing token:', error);
+               }
             };
-            
-            storeToken(token);
-            router.replace('(faculty)')
-        }
-
-      
+               
+            await storeToken(token);
+            router.replace('(faculty)');
+         }
+      } catch (error) {
+         console.error('Sign-in error:', error);
+         Alert.alert('Sign-in Failed', 'Something went wrong. Please try again.');
+      } finally {
+         setIsLoading(false);
+      }
    };
 
    return (
       <>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-          animation: "slide_from_right",
-        }}
-      />
-      <View style={styles.container}>
-         <Text style={styles.textHeader}>Faculty Sign In</Text>
+         <Stack.Screen
+            options={{
+               headerShown: false,
+               animation: "slide_from_right",
+            }}
+         />
+         <View style={styles.container}>
+            <Text style={styles.textHeader}>Faculty Sign In</Text>
 
-         <View style={styles.inputContainer}>
-            <TextInput 
-               placeholder='Email' 
-               style={styles.textInput} 
-               placeholderTextColor={Color.GRAY} 
-               autoCapitalize='none'
-               value={email}
-               onChangeText={setEmailAddress}
-            />
+            <View style={styles.inputContainer}>
+               <TextInput 
+                  placeholder='Email' 
+                  style={styles.textInput} 
+                  placeholderTextColor={Color.GRAY} 
+                  autoCapitalize='none'
+                  value={email}
+                  onChangeText={setEmailAddress}
+                  editable={!isLoading}
+               />
+            </View>
+
+            <View style={styles.inputContainer}>
+               <TextInput 
+                  placeholder='Password' 
+                  style={styles.textInput} 
+                  secureTextEntry={true} 
+                  placeholderTextColor={Color.GRAY} 
+                  value={password}
+                  onChangeText={setPassword}
+                  editable={!isLoading}
+               />
+            </View>
+
+            <View style={styles.buttonContainer}>
+               <TouchableOpacity style={[styles.button, isLoading && styles.disabledButton]} onPress={onSignInPress} disabled={isLoading}>
+                  {isLoading ? (
+                     <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                     <Text style={styles.buttonText}>Sign In</Text>
+                  )}
+               </TouchableOpacity>
+
+               <TouchableOpacity style={styles.button} onPress={() => router.push("/auth/faculty-sign-up")}>
+                  <Text style={styles.buttonText}>Sign Up</Text>
+               </TouchableOpacity>
+            </View>
          </View>
-
-         <View style={styles.inputContainer}>
-            <TextInput 
-               placeholder='Password' 
-               style={styles.textInput} 
-               secureTextEntry={true} 
-               placeholderTextColor={Color.GRAY} 
-               value={password}
-               onChangeText={setPassword}
-            />
-         </View>
-
-         <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={onSignInPress}>
-               <Text style={styles.buttonText}>Sign In</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.button} onPress={()=>router.push("/auth/faculty-sign-up")}>
-               <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
-         </View>
-      </View>
       </>
    );
 }
@@ -127,5 +140,8 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 16,
       fontWeight: '600',
-   }
+   },
+   disabledButton: {
+      backgroundColor: '#999',
+   },
 });

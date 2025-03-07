@@ -4,7 +4,7 @@ const bcrypt=require('bcrypt')
 const userRouter=Router();
 require('dotenv').config();
 const {auth_user}=require('../middlewares/user')
-const {UserModel, CourseModel,AttendanceModel, CurrentclassModel}=require("../db");
+const {UserModel, CourseModel,AttendanceModel, CurrentclassModel,MarkedModel}=require("../db");
 const nodemailer = require('nodemailer');
 
 const otpStore = new Map(); // Store email -> OTP pairs temporarily
@@ -112,6 +112,12 @@ userRouter.post('/verify-otp', async (req, res) => {
 });
 
 userRouter.use(auth_user);
+// userRouter.post("/marker",async function(req,res){
+//     const userid=req.user.id;
+//     const coursecode=req.body.coursecode;
+
+
+// })
 userRouter.get('/profile',async function(req,res){
     const id=req.user.id
     try{
@@ -207,11 +213,13 @@ userRouter.get('/total-attendance',async function(req,res){
         })
     }
 })
+
 userRouter.post('/mark-attendance',async function(req,res){
     let coursecode=req.body.coursecode;
     let hour=req.body.hour;
     let user=req.user.id;
     let ispresent=req.body.ispresent;
+    let Date=req.body.date;
     console.log(hour);
     try{
         let course=await CourseModel.findOne({
@@ -231,6 +239,8 @@ userRouter.post('/mark-attendance',async function(req,res){
                 { $set: { hours: h } }, // Update operation using $set
                 { upsert: false } // Optional: prevents creating a new document if none match
               );
+
+              
               
         }
         else{
@@ -240,6 +250,13 @@ userRouter.post('/mark-attendance',async function(req,res){
                 hours:hour
             })
         }
+        await MarkedModel.create({
+            coursecode:id,
+            ispresent:ispresent,
+            studentid:user,
+            Date:Date
+
+      })
         res.send({
             msg:"Attendance marked sucessfully",
             marked:true

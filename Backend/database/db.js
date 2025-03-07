@@ -16,6 +16,14 @@ const attendance= new Schema({
     hours:{type:Number,default:0},
     studentid:ObjectId,
 })
+
+const marked=new Schema({
+    coursecode:ObjectId,
+    ispresent:Boolean,
+    studentid:ObjectId,
+    Date:Date
+})
+
 const admin= new Schema({
     email:{type:String,unique:true},
     password:String,
@@ -40,10 +48,12 @@ const AdminModel=mongoose.model("admin",admin);
 const CourseModel=mongoose.model("course",course);
 const AttendanceModel=mongoose.model("attendance",attendance)
 const CurrentclassModel=mongoose.model("currentclass",currentclass);
+const MarkedModel=mongoose.model("marked",marked)
 module.exports={
     UserModel:UserModel,
     AdminModel:AdminModel,
     CourseModel:CourseModel,
     AttendanceModel:AttendanceModel,
-    CurrentclassModel:CurrentclassModel
+    CurrentclassModel:CurrentclassModel,
+    MarkedModel:MarkedModel
 }

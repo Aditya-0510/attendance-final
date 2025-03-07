@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import Header from "../../components/header";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from "expo-router";
+import { useRouter,useLocalSearchParams } from "expo-router";
 import axios from 'axios';
 
 export default function ClassDetails() {
@@ -87,7 +87,11 @@ export default function ClassDetails() {
       console.log(response.data);
       if (response.data.success) {
         Alert.alert(response.data.msg)
-        router.push("/pages/current-class");
+        router.push({
+          pathname: "/pages/current-class",
+          params: { batch: selectedBatch,title:selectedCourse.title},
+       });
+       
       } else {
         Alert.alert("Start Class Failed", response.data.message || "Unable to start class");
       }
@@ -188,7 +192,7 @@ export default function ClassDetails() {
           style={styles.startButton}
           onPress={handleStartClass}
         >
-          <Text style={styles.startButtonText}>Start</Text>
+          <Text style={styles.startButtonText}>Start </Text>
         </TouchableOpacity>
 
         {/* Course Modal */}

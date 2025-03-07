@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter, Stack } from "expo-router";
 import React, { useState } from 'react';
 import Color from '../../constant/Color';
@@ -10,78 +10,92 @@ export default function SignIn() {
 
    const [email, setEmailAddress] = useState('');
    const [password, setPassword] = useState('');
+   const [isLoading, setIsLoading] = useState(false); // Loading state
 
-   const SignInData = {email,password}
-   
+   const SignInData = { email, password };
+
    const onSignInPress = async () => {
-      const response = await axios.post('http:10.0.8.75:5000/user/signin', SignInData, {});
-      Alert.alert(response.data.msg);
+      setIsLoading(true);
 
-      const success = response.data.success
+      try {
+         const response = await axios.post('http://10.0.8.75:5000/user/signin', SignInData);
+         Alert.alert(response.data.msg);
 
-      console.log(success);
-      if(success){
-          const token = response.data.token;
-          
-          const storeToken = async (token) => {
-              try {
+         const success = response.data.success;
+         console.log(success);
+
+         if (success) {
+            const token = response.data.token;
+
+            const storeToken = async (token) => {
+               try {
                   await AsyncStorage.setItem('authToken', token);
-                  // await AsyncStorage.setItem('user', user);
                   console.log('Token stored successfully!');
-                } catch (error) {
-                    console.error('Error storing token:', error);
-                }
+               } catch (error) {
+                  console.error('Error storing token:', error);
+               }
             };
-            
-            storeToken(token);
-            router.replace('(tabs)')
-        }
 
+            await storeToken(token);
+            router.replace('(tabs)');
+         }
+      } catch (error) {
+         console.error('Sign-in error:', error);
+         Alert.alert('Sign-in Failed', 'Something went wrong. Please try again.');
+      } finally {
+         setIsLoading(false); // Stop loading
+      }
    };
 
    return (
       <>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-          animation: "slide_from_right",
-        }}
-      />
-      <View style={styles.container}>
-         <Text style={styles.textHeader}>Sign In</Text>
+         <Stack.Screen
+            options={{
+               headerShown: false,
+               animation: "slide_from_right",
+            }}
+         />
+         <View style={styles.container}>
+            <Text style={styles.textHeader}>Sign In</Text>
 
-         <View style={styles.inputContainer}>
-            <TextInput 
-               placeholder='Email' 
-               style={styles.textInput} 
-               placeholderTextColor={Color.GRAY} 
-               autoCapitalize='none'
-               value={email}
-               onChangeText={setEmailAddress}
-            />
+            <View style={styles.inputContainer}>
+               <TextInput
+                  placeholder='Email'
+                  style={styles.textInput}
+                  placeholderTextColor={Color.GRAY}
+                  autoCapitalize='none'
+                  value={email}
+                  onChangeText={setEmailAddress}
+                  editable={!isLoading}
+               />
+            </View>
+
+            <View style={styles.inputContainer}>
+               <TextInput
+                  placeholder='Password'
+                  style={styles.textInput}
+                  secureTextEntry={true}
+                  placeholderTextColor={Color.GRAY}
+                  value={password}
+                  onChangeText={setPassword}
+                  editable={!isLoading}
+               />
+            </View>
+
+            <View style={styles.buttonContainer}>
+               <TouchableOpacity style={[styles.button, isLoading && styles.disabledButton]} onPress={onSignInPress} disabled={isLoading}>
+                  {isLoading ? (
+                     <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                     <Text style={styles.buttonText}>Sign In</Text>
+                  )}
+               </TouchableOpacity>
+
+               <TouchableOpacity style={styles.button} onPress={() => router.push("/auth/sign-up")}>
+                  <Text style={styles.buttonText}>Sign Up</Text>
+               </TouchableOpacity>
+            </View>
          </View>
-
-         <View style={styles.inputContainer}>
-            <TextInput 
-               placeholder='Password' 
-               style={styles.textInput} 
-               secureTextEntry={true} 
-               placeholderTextColor={Color.GRAY} 
-               value={password}
-               onChangeText={setPassword}
-            />
-         </View>
-
-         <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={onSignInPress}>
-               <Text style={styles.buttonText}>Sign In</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.button} onPress={() => router.push("/auth/sign-up")}>
-               <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
-         </View>
-      </View>
       </>
    );
 }
@@ -128,26 +142,7 @@ const styles = StyleSheet.create({
       fontSize: 16,
       fontWeight: '600',
    },
-   googleButton: {
-      backgroundColor: 'white',
-      paddingVertical: 15,
-      borderRadius: 25,
-      marginTop: 15,
-      borderWidth: 1,
-      borderColor: '#ddd',
-      alignItems: 'center',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      width: '70%',
-   },
-   googleButtonText: {
-      color: 'black',
-      fontSize: 16,
-      fontWeight: '600',
-      marginLeft: 10,
-   },
-   googleIcon: {
-      width: 24,
-      height: 24,
-   },
+   disabledButton: {
+      backgroundColor: '#999', // Greyed out when disabled
+   }
 });

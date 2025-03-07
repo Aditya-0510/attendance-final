@@ -4,10 +4,11 @@ const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken');
 const {auth_admin}=require('../middlewares/admin')
 require('dotenv').config();
-const {AdminModel,CourseModel, CurrentclassModel, AttendanceModel, UserModel}=require("../db");
+const {AdminModel,CourseModel, CurrentclassModel, AttendanceModel, UserModel, MarkedModel}=require("../db");
 
 
 const nodemailer = require('nodemailer');
+const admin = require('../middlewares/admin');
 
 const otpStore = new Map(); // Store email -> OTP pairs temporarily
 
@@ -133,6 +134,44 @@ catch(e){
 })
 
 adminRouter.use(auth_admin);
+
+adminRouter.get("/present",async function(req,res){
+    
+    const batch=req.query.batch;
+
+    try{
+        let attendance=[];
+        const user=await UserModel.find({
+            Batch:batch
+        })
+        for(let i=0;i<user.length;i++){
+            let userId=user[i]._id
+            const student = await MarkedModel.findOne({
+                studentid:userId
+            })
+            if(student){
+                attendance.push({
+                    rollno:user[i].rollno,
+                    attendance:"Present"
+                })
+            }
+            else{
+                attendance.push({
+                    rollno:user[i].rollno,
+                    attendance:"Absent"
+                })
+            }
+        }
+        console.log(attendance);
+        res.send(attendance);
+    }
+    catch(e){
+        res.status(500).send({
+            msg:"internal server error"
+        })
+    }
+
+})
 adminRouter.get('/get-all',async function(req,res){
     const coursecode=req.query.coursecode;
     try{
@@ -229,7 +268,7 @@ adminRouter.post('/start-class',async function(req,res){
         thour=thour+parseInt(hours)
         console.log(hours);
 
-    const result = await CourseModel.updateOne(
+     await CourseModel.updateOne(
         { coursecode: coursecode }, // Find by coursecode
         { $set: { total_hours: thour } } // Use $set to update the field
       );

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, SafeAreaView, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from "expo-router";
+import { useRouter,useLocalSearchParams } from "expo-router";
 import Header from "../../components/Fheader";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -10,6 +10,7 @@ export default function CurrentClass() {
     const [classDetails, setClassDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { batch,title } = useLocalSearchParams();
 
     const getToken = async () => {
         try {
@@ -60,7 +61,10 @@ export default function CurrentClass() {
             });
 
             Alert.alert('Class Stopped', response.data.msg);
-            router.push("(faculty)");
+            router.push({
+                pathname: "/pages/today-attendance",
+                params: { batch: batch,title,title},
+             });
         } catch (err) {
             console.error('Error stopping class:', err);
             Alert.alert('Error', err.response?.data?.message || "Failed to stop the class");

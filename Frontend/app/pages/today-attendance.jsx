@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, SafeAreaView, TouchableOpacity, Alert } from "react-native";
 import axios from "axios";
-
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { useLocalSearchParams } from 'expo-router';
@@ -11,7 +10,7 @@ import Papa from "papaparse";
 export default function StudentTable() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { coursecode, title } = useLocalSearchParams();
+  const { batch,title } = useLocalSearchParams();
   // console.log(coursecode);
 
   const getToken = async () => {
@@ -34,15 +33,15 @@ export default function StudentTable() {
           return;
         }
 
-        const response = await axios.get("http://10.0.8.75:5000/admin/get-all", {
+        const response = await axios.get("http://10.0.8.75:5000/admin/present", {
           headers: { 'token': token },
-          params: { coursecode: coursecode },
+          params: { batch: batch },
         });
 
         console.log(response.data)
 
         // Ensure response.data is always an array
-        if (response.data && Array.isArray(response.data)) {
+        if (response.data) {
           setStudents(response.data);
         } else {
           setStudents([]); // Set empty array if no data
@@ -67,7 +66,7 @@ export default function StudentTable() {
     // Convert student data to CSV format
     const csvData = Papa.unparse(students.map(student => ({
       "Roll Number": student.rollno,
-      "Percentage": student.percentage.toFixed(2) + "%"
+      "Attendance": student.attendance
     })));
 
     const filePath = FileSystem.cacheDirectory + "StudentData.csv";
@@ -103,7 +102,7 @@ export default function StudentTable() {
           <View style={styles.table}>
             <View style={[styles.row, styles.header]}>
               <Text style={[styles.cell, styles.headerText]}>Roll Number</Text>
-              <Text style={[styles.cell, styles.headerText]}>Percentage</Text>
+              <Text style={[styles.cell, styles.headerText]}>Attendance</Text>
             </View>
 
             <FlatList
@@ -112,7 +111,7 @@ export default function StudentTable() {
               renderItem={({ item }) => (
                 <View style={styles.row}>
                   <Text style={styles.cell}>{item.rollno}</Text>
-                  <Text style={styles.cell}>{item.percentage.toFixed(2)}%</Text>
+                  <Text style={styles.cell}>{item.attendance}</Text>
                 </View>
               )}
             />
