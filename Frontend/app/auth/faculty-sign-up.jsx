@@ -7,6 +7,11 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useRouter, Stack } from "expo-router";
 import Color from "../../constant/Color";
@@ -22,8 +27,7 @@ export default function FacultySignUpScreen() {
   const [loading, setLoading] = React.useState(false);
 
   const validateEmailDomain = (email) => {
-    const validDomain = "@iiitdwd.ac.in";
-    return email.endsWith(validDomain);
+    return email.endsWith("@iiitdwd.ac.in");
   };
 
   const onSignUpPress = async () => {
@@ -60,7 +64,6 @@ export default function FacultySignUpScreen() {
         "http://10.0.8.75:5000/admin/signup",
         SignUpData
       );
-      console.log("hellouii");
 
       Alert.alert("Success", response.data.msg || "Signup successful!");
       router.push("/auth/faculty-otp");
@@ -85,87 +88,101 @@ export default function FacultySignUpScreen() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
           animation: "slide_from_right",
         }}
       />
-      <View style={styles.container}>
-        <Text style={styles.textHeader}>Faculty Sign Up</Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <ScrollView contentContainerStyle={styles.scrollView}>
+            <View style={styles.container}>
+              <Text style={styles.textHeader}>Faculty Sign Up</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            placeholder="Enter name"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={setName}
-            autoCapitalize="words"
-          />
-        </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={name}
+                  placeholder="Enter name"
+                  placeholderTextColor={Color.GRAY}
+                  onChangeText={setName}
+                  autoCapitalize="words"
+                />
+              </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={email}
-            placeholder="Enter email (must end with @iiitdwd.ac.in)"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={setEmailAddress}
-            keyboardType="email-address"
-          />
-        </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  autoCapitalize="none"
+                  value={email}
+                  placeholder="Enter email (must end with @iiitdwd.ac.in)"
+                  placeholderTextColor={Color.GRAY}
+                  onChangeText={setEmailAddress}
+                  keyboardType="email-address"
+                />
+              </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={password}
-            placeholder="Enter password"
-            placeholderTextColor={Color.GRAY}
-            secureTextEntry={true}
-            onChangeText={setPassword}
-          />
-        </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={password}
+                  placeholder="Enter password"
+                  placeholderTextColor={Color.GRAY}
+                  secureTextEntry={true}
+                  onChangeText={setPassword}
+                />
+              </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={confirmPassword}
-            placeholder="Confirm password"
-            placeholderTextColor={Color.GRAY}
-            secureTextEntry={true}
-            onChangeText={setConfirmPassword}
-          />
-        </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={confirmPassword}
+                  placeholder="Confirm password"
+                  placeholderTextColor={Color.GRAY}
+                  secureTextEntry={true}
+                  onChangeText={setConfirmPassword}
+                />
+              </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={onSignUpPress}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>Continue</Text>
-            )}
-          </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={onSignUpPress}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text style={styles.buttonText}>Continue</Text>
+                  )}
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={() => router.push("/auth/faculty-sign-in")}
-            disabled={loading}
-          >
-            <Text style={styles.secondaryButtonText}>
-              Already have an account? Sign In
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+                <TouchableOpacity
+                  style={[styles.button, styles.secondaryButton]}
+                  onPress={() => router.push("/auth/faculty-sign-in")}
+                  disabled={loading}
+                >
+                  <Text style={styles.secondaryButtonText}>
+                    Already have an account? Sign In
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 20,
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -218,3 +235,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+

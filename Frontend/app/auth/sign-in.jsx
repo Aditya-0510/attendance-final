@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter, Stack } from "expo-router";
-import React, { useState } from 'react';
+import React, { useState,useCallback } from 'react';
+import { useFocusEffect } from "@react-navigation/native";
 import Color from '../../constant/Color';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,6 +14,21 @@ export default function SignIn() {
    const [isLoading, setIsLoading] = useState(false); // Loading state
 
    const SignInData = { email, password };
+
+   useFocusEffect(
+      useCallback(() => {
+        router.setParams({
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ marginLeft: 15, padding: 10 }}
+            >
+              <Ionicons name="arrow-back" size={30} color="black" />
+            </TouchableOpacity>
+          ),
+        });
+      }, [])
+    );
 
    const onSignInPress = async () => {
       setIsLoading(true);
@@ -51,7 +67,7 @@ export default function SignIn() {
       <>
          <Stack.Screen
             options={{
-               headerShown: false,
+               headerShown: true,
                animation: "slide_from_right",
             }}
          />

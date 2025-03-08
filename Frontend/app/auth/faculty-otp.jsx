@@ -55,7 +55,7 @@ export default function SignIn() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
           animation: "slide_from_right",
         }}
       />
