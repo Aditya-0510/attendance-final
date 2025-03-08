@@ -164,7 +164,7 @@ export default function Verification() {
         setIsVerificationComplete(true);
         setShowRecordedMessage(true);
         setTimeout(() => {
-          router.push("pages/recorded");
+          router.replace("pages/recorded");
         }, 2000);
       } else if (result.error === 'user_cancel') {
         console.log('User cancelled authentication');

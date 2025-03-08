@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, TouchableOpacity,Alert } from 'react-native'
+import React ,{useState,useEffect} from 'react'
 import { useRouter} from "expo-router";
+import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
     const router = useRouter();

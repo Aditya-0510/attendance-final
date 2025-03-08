@@ -79,15 +79,6 @@ export default function index() {
 
 
     const styles = StyleSheet.create({
-        // signedOutContainer: {
-        //   flex: 1,
-        //   justifyContent: "center",
-        //   alignItems: "center",
-        //   padding: 20,
-        //   backgroundColor: "#D0C8F2",
-        //   width: '100%',
-        //   height: '100%'
-        // },
         container: {
           flex: 1,
           justifyContent: "center",
@@ -96,12 +87,12 @@ export default function index() {
           backgroundColor: "#ffffff",
         },
         welcomeText: {
-          fontSize: 26,  // Bigger font size
+          fontSize: 26,  
           fontWeight: "bold",
           textAlign: "center",
-          color: "#1E73E8",  // Primary color
+          color: "#1E73E8",  
           marginBottom: 20,
-          textTransform: "capitalize",  // Ensures first letter is uppercase
+          textTransform: "capitalize",  
           shadowColor: "#000",
           shadowOffset: { width: 2, height: 2 },
           shadowOpacity: 0.2,

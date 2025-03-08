@@ -74,7 +74,7 @@ export default function Recorded() {
             </View>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.push("(tabs)")}
+              onPress={() => router.replace("(tabs)")}
             >
               <Text style={styles.buttonText}>Go to Home</Text>
             </TouchableOpacity>
