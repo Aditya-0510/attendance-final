@@ -1,18 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  SafeAreaView,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import Header from "../../components/Fheader";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter,useLocalSearchParams } from "expo-router";
-import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter, useLocalSearchParams, Stack } from "expo-router";
+import axios from "axios";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ClassDetails() {
-
   const getToken = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
+      const token = await AsyncStorage.getItem("authToken");
       return token;
     } catch (error) {
-      console.error('Error retrieving token:', error);
+      console.error("Error retrieving token:", error);
       return null;
     }
   };
@@ -22,29 +32,32 @@ export default function ClassDetails() {
   const [hoursModalVisible, setHoursModalVisible] = useState(false);
   const [batchModalVisible, setBatchModalVisible] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState({
-    name: 'Select Course',
+    name: "Select Course",
   });
-  const [selectedHours, setSelectedHours] = useState('No. of Hours');
-  const [selectedBatch, setBatch] = useState('Batch');
+  const [selectedHours, setSelectedHours] = useState("No. of Hours");
+  const [selectedBatch, setBatch] = useState("Batch");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const hours = ['1 - Tutorial', '1.5 - Class', '2 - Lab'];
-  const batch = ['CSE', 'ECE', 'DSAI'];
+  const hours = ["1 - Tutorial", "1.5 - Class", "2 - Lab"];
+  const batch = ["CSE", "ECE", "DSAI"];
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const token = await getToken();
         if (!token) {
-          Alert.alert('Error', 'Authentication token missing.');
+          Alert.alert("Error", "Authentication token missing.");
           return;
         }
-        const response = await axios.get('http://10.0.8.75:5000/admin/courses', {
-          headers: { "token": token }
-        });
-  
+        const response = await axios.get(
+          "http://10.0.8.75:5000/admin/courses",
+          {
+            headers: { token: token },
+          }
+        );
+
         // console.log('API Response:', response.data.courses); // Check what's coming from the API
         setCourses(response.data.courses);
       } catch (err) {
@@ -54,75 +67,87 @@ export default function ClassDetails() {
         setLoading(false);
       }
     };
-  
+
     fetchCourses();
   }, []);
-  
 
   const handleStartClass = async () => {
-    if (selectedCourse.id === 'N/A' || selectedHours === 'No. of Hours' || selectedBatch === 'Batch') {
-      Alert.alert("Incomplete Selection", "Please select a course, batch, and hours before starting the class");
+    if (
+      selectedCourse.id === "N/A" ||
+      selectedHours === "No. of Hours" ||
+      selectedBatch === "Batch"
+    ) {
+      Alert.alert(
+        "Incomplete Selection",
+        "Please select a course, batch, and hours before starting the class"
+      );
       return;
     }
-    
+
     try {
       const token = await getToken();
       if (!token) {
-        Alert.alert('Error', 'Authentication token missing.');
+        Alert.alert("Error", "Authentication token missing.");
         return;
       }
-  
+
       const classData = {
         coursecode: selectedCourse.id, // Correct coursecode for API
-        title : selectedCourse.name,
+        title: selectedCourse.name,
         batch: selectedBatch,
-        hours: selectedHours.split(' ')[0], // Extract just the hours (e.g., "1" from "1 - Tutorial")
+        hours: selectedHours.split(" ")[0], // Extract just the hours (e.g., "1" from "1 - Tutorial")
       };
-  
-      console.log('Sending class data:', classData);
-  
-      const response = await axios.post('http://10.0.8.75:5000/admin/start-class', classData, {
-        headers: { 'token': token }
-      });
+
+      console.log("Sending class data:", classData);
+
+      const response = await axios.post(
+        "http://10.0.8.75:5000/admin/start-class",
+        classData,
+        {
+          headers: { token: token },
+        }
+      );
       console.log(response.data);
       if (response.data.success) {
-        Alert.alert(response.data.msg)
+        Alert.alert(response.data.msg);
         router.push({
           pathname: "/pages/current-class",
-          params: { batch: selectedBatch,title:selectedCourse.title},
-       });
-       
+          params: { batch: selectedBatch, title: selectedCourse.title },
+        });
       } else {
-        Alert.alert("Start Class Failed", response.data.message || "Unable to start class");
+        Alert.alert(
+          "Start Class Failed",
+          response.data.message || "Unable to start class"
+        );
       }
     } catch (error) {
-      console.error('Start Class Error:', error);
-      Alert.alert("Error", error.response?.data?.message || "Network error. Please try again.");
+      console.error("Start Class Error:", error);
+      Alert.alert(
+        "Error",
+        error.response?.data?.message || "Network error. Please try again."
+      );
     }
   };
-  
 
   const renderCourseItem = ({ item }) => {
-    console.log('Course item clicked:', item); // Debug log
+    console.log("Course item clicked:", item); // Debug log
     return (
       <TouchableOpacity
         style={styles.modalItem}
         onPress={() => {
           setSelectedCourse({
-            name: `${item.coursecode || 'N/A'} - ${item.title || 'N/A'}`,
-            id: item.coursecode || 'N/A' // Ensure coursecode is set for API call
+            name: `${item.coursecode || "N/A"} - ${item.title || "N/A"}`,
+            id: item.coursecode || "N/A", // Ensure coursecode is set for API call
           });
           setCourseModalVisible(false);
         }}
       >
         <Text style={styles.modalItemText}>
-          {item.coursecode || 'N/A'} - {item.title || 'N/A'}
+          {item.coursecode || "N/A"} - {item.title || "N/A"}
         </Text>
       </TouchableOpacity>
     );
   };
-  
-  
 
   const renderHoursItem = ({ item }) => (
     <TouchableOpacity
@@ -150,7 +175,23 @@ export default function ClassDetails() {
 
   return (
     <>
-      <Header />
+      <Stack.Screen
+        options={{
+          headerTitle: "",
+          animation: "slide_from_right",
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.replace('(faculty)')}
+              style={{ marginLeft: 15 }}
+            >
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          
+        }}
+      />
+
+      {/* <Header /> */}
 
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Class Details</Text>
@@ -188,10 +229,7 @@ export default function ClassDetails() {
         </TouchableOpacity>
 
         {/* Start Button */}
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={handleStartClass}
-        >
+        <TouchableOpacity style={styles.startButton} onPress={handleStartClass}>
           <Text style={styles.startButtonText}>Start </Text>
         </TouchableOpacity>
 
@@ -205,7 +243,9 @@ export default function ClassDetails() {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               {error ? (
-                <Text style={{ textAlign: 'center', color: 'red' }}>{error}</Text>
+                <Text style={{ textAlign: "center", color: "red" }}>
+                  {error}
+                </Text>
               ) : (
                 <FlatList
                   data={courses}
@@ -261,54 +301,54 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: 'white'
+    backgroundColor: "white",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center'
+    textAlign: "center",
   },
   dropdown: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 10,
     padding: 15,
-    marginBottom: 15
+    marginBottom: 15,
   },
   dropdownText: {
-    fontSize: 16
+    fontSize: 16,
   },
   dropdownIcon: {
-    fontSize: 12
+    fontSize: 12,
   },
   startButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     borderRadius: 10,
     padding: 15,
-    alignItems: 'center'
+    alignItems: "center",
   },
   startButtonText: {
-    color: 'white',
-    fontSize: 18
+    color: "white",
+    fontSize: 18,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    padding: 20
+    padding: 20,
   },
   modalItem: {
     padding: 15,
-    borderBottomWidth: 1
+    borderBottomWidth: 1,
   },
   modalItemText: {
-    fontSize: 16
-  }
+    fontSize: 16,
+  },
 });

@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E73E8", // Blue color matching UI
     paddingVertical: 15,
     paddingHorizontal: 50,
-    borderRadius: 50, // Rounded corners
+    borderRadius: 20, // Rounded corners
     width: "70%", // Button width to match design
     alignItems: "center",
     marginBottom: 15, // Space between buttons

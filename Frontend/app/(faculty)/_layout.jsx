@@ -37,6 +37,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
+          headerTitle: "Your Profile",
           tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Entypo name="user" size={size} color={color} />

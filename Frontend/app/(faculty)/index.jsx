@@ -104,39 +104,45 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-    container: {
+     container: {
         flex: 1,
-        backgroundColor: 'white'
+        backgroundColor: "#F5F5F5", // Light background for contrast
+        paddingHorizontal: 20,
+        justifyContent: "center",
     },
     buttonContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20
+        alignItems: "center",
     },
     welcomeText: {
         fontSize: 26,
         fontWeight: "bold",
         textAlign: "center",
-        color: "#1E73E8",
+        color: "#222", // Dark gray for better contrast
         marginBottom: 20,
         textTransform: "capitalize",
         shadowColor: "#000",
-        shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOffset: { width: 1, height: 2 },
+        shadowOpacity: 0.15,
         shadowRadius: 3,
     },
     button: {
-        width: '100%',
-        backgroundColor: '#007bff',
-        padding: 15,
-        borderRadius: 10,
+        width: "100%",
+        backgroundColor: "#007bff", 
+        paddingVertical: 16,
+        borderRadius: 12,
         marginVertical: 10,
-        alignItems: 'center'
+        alignItems: "center",
+        elevation: 5, // Android shadow
+        shadowColor: "#FF6B00",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
     },
     buttonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold'
-    }
+        color: "white",
+        fontSize: 17,
+        fontWeight: "bold",
+        letterSpacing: 0.8,
+        textTransform: "uppercase",
+    },
 });

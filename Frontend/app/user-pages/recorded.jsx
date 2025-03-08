@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter,Stack} from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../../components/header";
@@ -56,6 +56,12 @@ export default function Recorded() {
   return (
       
       <View style={styles.container}>
+        <Stack.Screen
+            options={{
+               headerShown: false,
+               animation: "slide_from_right",
+            }}
+         />
         {loading ? (
           <ActivityIndicator size="large" color="#1E73E8" />
         ) : error ? (

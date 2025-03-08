@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     borderWidth: 1,
-    borderRadius: 25,
+    borderRadius: 15,
     backgroundColor: "#e6f2ff",
     borderColor: "#cce0ff",
     overflow: "hidden",
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: Color.PRIMARY,
     paddingVertical: 15,
-    borderRadius: 25,
+    borderRadius: 15,
     marginTop: 20,
     alignItems: "center",
     width: "70%",

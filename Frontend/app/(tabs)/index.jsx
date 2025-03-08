@@ -50,7 +50,7 @@ export default function index() {
           <View style={styles.container1}>
             <View style={styles.imageContainerChart}>
               <Image
-                source={require("../../assets/images/vector-pie-chart.jpg")}
+                source={require("../../assets/images/iiitlogo.png")}
                 style={styles.imageChart}
                 resizeMode="contain"
               />
@@ -59,14 +59,14 @@ export default function index() {
             <View style={styles.buttonContainer1}>
               <TouchableOpacity 
                 style={styles.button1}
-                onPress={()=>router.push("pages/user-ongoing")}
+                onPress={()=>router.push("user-pages/user-ongoing")}
               >
                 <Text style={styles.buttonText1}>Current Class</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
                 style={styles.button1}
-                onPress={()=>router.push("pages/course")}
+                onPress={()=>router.push("user-pages/course")}
             >
                 <Text style={styles.buttonText1}>Course Analytics</Text>
               </TouchableOpacity>
@@ -78,109 +78,73 @@ export default function index() {
 }
 
 
-    const styles = StyleSheet.create({
-        container: {
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-          backgroundColor: "#ffffff",
-        },
-        welcomeText: {
-          fontSize: 26,  
-          fontWeight: "bold",
-          textAlign: "center",
-          color: "#1E73E8",  
-          marginBottom: 20,
-          textTransform: "capitalize",  
-          shadowColor: "#000",
-          shadowOffset: { width: 2, height: 2 },
-          shadowOpacity: 0.2,
-          shadowRadius: 3,
-      },
-        imageContainer: {
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: 30,
-        },
-        image: {
-          width: 240,
-          height: 240,
-        },
-        title: {
-          fontSize: 24,
-          fontWeight: "bold",
-          color: "black",
-          textAlign: "center",
-          marginTop: 20,
-          fontStyle: "italic",
-          width: "90%",
-          marginBottom: 30,
-        },
-        button: {
-          backgroundColor: "#1E73E8",
-          paddingVertical: 12,
-          paddingHorizontal: 40,
-          borderRadius: 50,
-          marginTop: 25,
-          elevation: 3,
-        },
-        buttonText: {
-          textAlign: "center",
-          fontSize: 16,
-          color: "white",
-          fontWeight: "bold",
-        },
-        imageContainerChart: {
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: 30,
-        },
-        imageChart:{
-          marginBottom: 20,
-          paddingBottom: 10,
-          marginTop: 20,
-          width: 300,
-          height: 300,
-        },
-        container1: {
-          flex: 1,
-          backgroundColor: "#FFFFFF",
-          padding: 20,
-          alignItems: "center",
-        },
-        header: {
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-          marginBottom: 20,
-        },
-        headerRightIcons: {
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 3,
-        },
-        iconSpacing: {
-          marginRight: 15,
-        },
-        buttonContainer1: {
-          width: "100%",
-          alignItems: "center",
-          gap: 15, 
-        },
-        button1: {
-          backgroundColor: "#1E73E8",
-          paddingVertical: 15,
-          paddingHorizontal: 35,
-          borderRadius: 50,
-          width: "85%",
-          alignItems: "center",
-          elevation: 3,
-        },
-        buttonText1: {
-          fontSize: 18,
-          fontWeight: "bold",
-          color: "white",
-        },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#F5F7FA", // Soft background for a premium feel
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#1E73E8",
+    marginBottom: 15,
+    textTransform: "capitalize",
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
+    letterSpacing: 0.5, // More refined spacing
+  },
+  imageContainerChart: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  imageChart: {
+    width: 260,
+    height: 260,
+    marginVertical: 8,
+  },
+  container1: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    alignItems: "center",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  buttonContainer1: {
+    width: "100%",
+    alignItems: "center",
+    gap: 15,
+    marginTop: 8,
+  },
+  button1: {
+    backgroundColor: "#1E73E8",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 50,
+    width: "85%", // Ensuring both buttons have the same width
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  buttonText1: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
 });

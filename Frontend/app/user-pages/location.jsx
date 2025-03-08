@@ -72,7 +72,7 @@ export default function AuthScreen() {
   const handleLocationVerified = useCallback(() => {
     setLocationVerified(true);
     // Navigate to biometric verification screen
-    router.replace("pages/biometric");
+    router.replace("user-pages/biometric");
   }, [router]);
 
   // Location tracking effect

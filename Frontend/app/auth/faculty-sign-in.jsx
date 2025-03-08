@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
    textInput: {
       padding: 12,
       borderWidth: 1,
-      borderRadius: 25,
+      borderRadius: 15,
       backgroundColor: '#e6f2ff',
       borderColor: '#cce0ff',
       fontSize: 16,
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
    button: {
       backgroundColor: Color.PRIMARY,
       paddingVertical: 15,
-      borderRadius: 25,
+      borderRadius: 15,
       marginTop: 20,
       alignItems: 'center',
       width: '70%',

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image, Platform, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as LocalAuthentication from "expo-local-authentication";
-import { useRouter } from "expo-router";
+import { useRouter,Stack } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
 import Header from "../../components/header"; 
@@ -182,7 +182,7 @@ export default function Verification() {
         setIsVerificationComplete(true);
         setShowRecordedMessage(true);
         setTimeout(() => {
-          router.replace("pages/recorded");
+          router.replace("user-pages/recorded");
         }, 2000);
       } else if (result.error === 'user_cancel') {
         console.log('User cancelled authentication');
@@ -208,6 +208,12 @@ export default function Verification() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen
+            options={{
+               headerShown: false,
+               animation: "slide_from_right",
+            }}
+         />
       <Image 
         source={require("../../assets/images/logo-new-edited.jpg")} 
         style={styles.image} 

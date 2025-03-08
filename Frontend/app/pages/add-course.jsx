@@ -53,8 +53,6 @@ export default function AddCourse() {
     };
 
     return (
-        <>
-        <Header/>
         <View style={styles.container}>
             <Text style={styles.header}>Adding a Course</Text>
             <TextInput
@@ -73,7 +71,6 @@ export default function AddCourse() {
                 <Text style={styles.buttonText}>Add Course</Text>
             </TouchableOpacity>
         </View>
-        </>
     );
 }
 

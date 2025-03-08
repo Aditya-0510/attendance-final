@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter,Stack } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import Header from "../../components/header";
 import axios from 'axios';
@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import Svg, { G, Circle } from 'react-native-svg';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Attendance() {
   const router = useRouter();
@@ -68,6 +69,28 @@ export default function Attendance() {
     const missedStrokeDashoffset = circleCircumference - (circleCircumference * missedPercentage) / 100;
     
     return (
+      <>
+      <Stack.Screen
+        options={{
+          headerTitle: "",
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ marginLeft: 15}}
+            >
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push("user-pages/notification")}
+              style={{ marginRight: 15}}
+            >
+              <Ionicons name="notifications-outline" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
       <View style={styles.pieChartContainer}>
         <Svg width="100%" height="100%" viewBox={`0 0 ${radius * 2 + 20} ${radius * 2 + 20}`}>
           <G rotation="-90" origin={`${radius + 10}, ${radius + 10}`}>
@@ -98,12 +121,12 @@ export default function Attendance() {
           <Text style={styles.percentageText}>{percentage.toFixed(0)}%</Text>
         </View>
       </View>
+      </>
     );
   };
 
   return (
     <View style={styles.container}>
-      <Header />
       <Text style={styles.title}>{title}</Text>
 
       {loading ? (

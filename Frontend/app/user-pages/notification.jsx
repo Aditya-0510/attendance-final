@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Header from "../../components/header";
-import { useRouter } from "expo-router";
+import { useRouter,Stack } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Notification() {
   const router = useRouter();
@@ -53,7 +54,28 @@ export default function Notification() {
 
   return (
     <>
-      <Header />
+    <Stack.Screen
+  options={{
+    headerTitle: "",
+    headerLeft: () => (
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={{ marginLeft: 15}}
+      >
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+    ),
+    headerRight: () => (
+      <TouchableOpacity
+        onPress={() => router.push("user-pages/notification")}
+        style={{ marginRight: 15}}
+      >
+        <Ionicons name="notifications-outline" size={24} color="black" />
+      </TouchableOpacity>
+    ),
+  }}
+/>
+      {/* <Header /> */}
       
       {loading ? (
         <ActivityIndicator size="large" color="#2196F3" style={styles.loader} />

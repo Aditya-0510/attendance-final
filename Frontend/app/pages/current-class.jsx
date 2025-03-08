@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View, SafeAreaView, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useRouter,useLocalSearchParams } from "expo-router";
+import { useRouter,useLocalSearchParams,Stack} from "expo-router";
 import Header from "../../components/Fheader";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CurrentClass() {
     const router = useRouter();
@@ -81,16 +82,29 @@ export default function CurrentClass() {
     if (loading) {
         return (
             <SafeAreaView style={styles.container}>
-                <Header />
+                {/* <Header /> */}
                 <ActivityIndicator size="large" color="#007bff" style={styles.loader} />
             </SafeAreaView>
         );
     }
 
     return (
-        <>
-            <Header />
+        // <>
             <SafeAreaView style={styles.container}>
+                <Stack.Screen
+                            options={{
+                               headerShown: true,
+                               animation: "slide_from_right",
+                               headerLeft: () => (
+                                <TouchableOpacity
+                                  onPress={() => router.replace('(faculty)')}
+                                  style={{ marginLeft: 15 }}
+                                >
+                                  <Ionicons name="arrow-back" size={24} color="black" />
+                                </TouchableOpacity>
+                              ),
+                            }}
+                         />
                 {error ? (
                     <Text style={styles.errorText}>{error}</Text>
                 ) : classDetails ? (
@@ -121,7 +135,7 @@ export default function CurrentClass() {
                     <Text style={styles.noClassText}>No ongoing class at the moment.</Text>
                 )}
             </SafeAreaView>
-        </>
+        // </>
     );
 }
 

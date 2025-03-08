@@ -110,7 +110,6 @@ export default function StudentTable() {
     // <View>
     
       <SafeAreaView style={styles.container}>
-        <Header/>
         <Text style={styles.title}>Student Performance for {title}</Text>
 
         <TouchableOpacity style={styles.exportButton} onPress={exportToCSV}>
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop:35,
+    marginTop:30,
     marginBottom: 15,
   },
   noDataText: {
@@ -202,6 +201,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: "center",
     marginBottom: 20, // Adjusted spacing
+    marginTop:10,
   },
   exportButtonText: {
     color: "white",
