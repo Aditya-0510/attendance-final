@@ -4,6 +4,7 @@ import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
+import Header from "../../components/header"; 
 
 export default function Verification() {
   const [isBiometricSupported, setIsBiometricSupported] = useState(null);

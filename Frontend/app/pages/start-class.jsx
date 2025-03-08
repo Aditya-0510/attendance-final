@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
-import Header from "../../components/header";
+import Header from "../../components/Fheader";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter,useLocalSearchParams } from "expo-router";
 import axios from 'axios';

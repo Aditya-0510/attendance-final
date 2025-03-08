@@ -1,23 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, SafeAreaView, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  SafeAreaView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import axios from "axios";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
-import { useLocalSearchParams } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Papa from "papaparse";
+import Header from "../../components/Fheader";
 
 export default function StudentTable() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { batch,title } = useLocalSearchParams();
+  const { batch, title } = useLocalSearchParams();
   // console.log(coursecode);
 
   const getToken = async () => {
     try {
-      return await AsyncStorage.getItem('authToken');
+      return await AsyncStorage.getItem("authToken");
     } catch (error) {
-      console.error('Error retrieving token:', error);
+      console.error("Error retrieving token:", error);
       return null;
     }
   };
@@ -28,17 +38,20 @@ export default function StudentTable() {
         setLoading(true);
         const token = await getToken();
         if (!token) {
-          Alert.alert('Error', 'Authentication token missing.');
+          Alert.alert("Error", "Authentication token missing.");
           setLoading(false);
           return;
         }
 
-        const response = await axios.get("http://10.0.8.75:5000/admin/present", {
-          headers: { 'token': token },
-          params: { batch: batch },
-        });
+        const response = await axios.get(
+          "http://10.0.8.75:5000/admin/present",
+          {
+            headers: { token: token },
+            params: { batch: batch },
+          }
+        );
 
-        console.log(response.data)
+        console.log(response.data);
 
         // Ensure response.data is always an array
         if (response.data) {
@@ -64,20 +77,27 @@ export default function StudentTable() {
     }
 
     // Convert student data to CSV format
-    const csvData = Papa.unparse(students.map(student => ({
-      "Roll Number": student.rollno,
-      "Attendance": student.attendance
-    })));
+    const csvData = Papa.unparse(
+      students.map((student) => ({
+        "Roll Number": student.rollno,
+        Attendance: student.attendance,
+      }))
+    );
 
     const filePath = FileSystem.cacheDirectory + "StudentData.csv";
 
     try {
-      await FileSystem.writeAsStringAsync(filePath, csvData, { encoding: FileSystem.EncodingType.UTF8 });
+      await FileSystem.writeAsStringAsync(filePath, csvData, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
 
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(filePath);
       } else {
-        Alert.alert("Sharing Not Available", "Unable to share file on this device.");
+        Alert.alert(
+          "Sharing Not Available",
+          "Unable to share file on this device."
+        );
       }
     } catch (error) {
       console.error("Error exporting CSV:", error);
@@ -86,39 +106,45 @@ export default function StudentTable() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Student Performance for {title}</Text>
+    
+      
+      <SafeAreaView style={styles.container}>
+        <Header />
+        <Text style={styles.title}>Student Performance for {title}</Text>
 
-      <TouchableOpacity style={styles.exportButton} onPress={exportToCSV}>
-        <Text style={styles.exportButtonText}>Export to CSV</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.exportButton} onPress={exportToCSV}>
+          <Text style={styles.exportButtonText}>Export to CSV</Text>
+        </TouchableOpacity>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#007bff" />
-      ) : students.length === 0 ? (
-        <Text style={styles.noDataText}>No students found.</Text>
-      ) : (
-        <View>
-          <View style={styles.table}>
-            <View style={[styles.row, styles.header]}>
-              <Text style={[styles.cell, styles.headerText]}>Roll Number</Text>
-              <Text style={[styles.cell, styles.headerText]}>Attendance</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#007bff" />
+        ) : students.length === 0 ? (
+          <Text style={styles.noDataText}>No students found.</Text>
+        ) : (
+          <View>
+            <View style={styles.table}>
+              <View style={[styles.row, styles.header]}>
+                <Text style={[styles.cell, styles.headerText]}>
+                  Roll Number
+                </Text>
+                <Text style={[styles.cell, styles.headerText]}>Attendance</Text>
+              </View>
+
+              <FlatList
+                data={students}
+                keyExtractor={(item) => item.rollno.toString()}
+                renderItem={({ item }) => (
+                  <View style={styles.row}>
+                    <Text style={styles.cell}>{item.rollno}</Text>
+                    <Text style={styles.cell}>{item.attendance}</Text>
+                  </View>
+                )}
+              />
             </View>
-
-            <FlatList
-              data={students}
-              keyExtractor={(item) => item.rollno.toString()}
-              renderItem={({ item }) => (
-                <View style={styles.row}>
-                  <Text style={styles.cell}>{item.rollno}</Text>
-                  <Text style={styles.cell}>{item.attendance}</Text>
-                </View>
-              )}
-            />
           </View>
-        </View>
-      )}
-    </SafeAreaView>
+        )}
+      </SafeAreaView>
+    
   );
 }
 
@@ -126,56 +152,57 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 15
+    marginTop:35,
+    marginBottom: 15,
   },
   noDataText: {
     fontSize: 18,
     textAlign: "center",
     color: "gray",
-    marginTop: 20
+    marginTop: 20,
   },
   table: {
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 10,
-    overflow: "hidden"
+    overflow: "hidden",
   },
   row: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     paddingVertical: 10,
-    backgroundColor: "#f9f9f9"
+    backgroundColor: "#f9f9f9",
   },
   header: {
-    backgroundColor: "#007bff"
+    backgroundColor: "#007bff",
   },
   headerText: {
     color: "#fff",
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   cell: {
     flex: 1,
     textAlign: "center",
     paddingVertical: 10,
-    fontSize: 16
+    fontSize: 16,
   },
   exportButton: {
     backgroundColor: "#28a745",
     borderRadius: 10,
     padding: 15,
     alignItems: "center",
-    marginBottom: 20 // Adjusted spacing
+    marginBottom: 20, // Adjusted spacing
   },
   exportButtonText: {
     color: "white",
     fontSize: 18,
-    fontWeight: "bold"
-  }
+    fontWeight: "bold",
+  },
 });

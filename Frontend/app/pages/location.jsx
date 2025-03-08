@@ -1,7 +1,15 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
+import Header from "../../components/header";
 
 export default function AuthScreen() {
   const router = useRouter();
@@ -14,11 +22,11 @@ export default function AuthScreen() {
   // Define boundary
   const BOUNDARY = {
     corner1: { lat: 15.4007844, lng: 75.0258996 },
-    corner2: { lat: 15.4002653, lng: 75.0158310 },
-    corner3: { lat: 15.3897100, lng: 75.0167238 },
+    corner2: { lat: 15.4002653, lng: 75.015831 },
+    corner3: { lat: 15.38971, lng: 75.0167238 },
     corner4: { lat: 15.3856518, lng: 75.0246933 },
   };
-/*// Define boundary
+  /*// Define boundary
   const BOUNDARY = {
     corner1: { lat: 15.3928349, lng: 75.0251171 },
     corner2: { lat: 15.3927314, lng: 75.0251674 },
@@ -121,7 +129,6 @@ export default function AuthScreen() {
 
         // Store the remove function
         locationSubscription.current = subscription.remove;
-
       } catch (error) {
         setErrorMsg("Error getting location: " + error.message);
         Alert.alert("Error", "Failed to get location. Please try again.");
@@ -141,7 +148,7 @@ export default function AuthScreen() {
   }, [locationVerified, isInsideBoundary, handleLocationVerified]);
 
   return (
-    <View style={styles.container}>
+      <View style={styles.container}>
         {location && !locationVerified ? (
           <Text style={styles.text}>Fetching your location...</Text>
         ) : locationVerified ? (
@@ -159,7 +166,7 @@ export default function AuthScreen() {
         )}
 
         {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
-    </View>
+      </View>
   );
 }
 
