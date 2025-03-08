@@ -54,7 +54,7 @@ export default function Otp() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
           animation: "slide_from_right",
         }}
       />

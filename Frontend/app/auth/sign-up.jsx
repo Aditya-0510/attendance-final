@@ -7,6 +7,9 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { useRouter, Stack } from "expo-router";
 import Color from "../../constant/Color";
@@ -62,7 +65,6 @@ export default function SignUpScreen() {
         "http://10.0.8.75:5000/user/signup",
         SignUpData
       );
-      console.log("hellouii");
 
       Alert.alert("Success", response.data.msg || "Signup successful!");
       router.push("/auth/otp");
@@ -87,112 +89,126 @@ export default function SignUpScreen() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
           animation: "slide_from_right",
         }}
       />
-      <View style={styles.container}>
-        <Text style={styles.textHeader}>Sign Up</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingContainer}
+      >
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+          <View style={styles.container}>
+            <Text style={styles.textHeader}>Sign Up</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            placeholder="Enter name"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={(text) => setName(String(text))}
-            autoCapitalize="words"
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                value={name}
+                placeholder="Enter name"
+                placeholderTextColor={Color.GRAY}
+                onChangeText={(text) => setName(String(text))}
+                autoCapitalize="words"
+              />
+            </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={email}
-            placeholder="Enter email"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={(text) => setEmailAddress(String(text))}
-            keyboardType="email-address"
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                autoCapitalize="none"
+                value={email}
+                placeholder="Enter email"
+                placeholderTextColor={Color.GRAY}
+                onChangeText={(text) => setEmailAddress(String(text))}
+                keyboardType="email-address"
+              />
+            </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={roll}
-            placeholder="Enter Roll number"
-            placeholderTextColor={Color.GRAY}
-            onChangeText={(text) => setrollno(String(text))}
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                autoCapitalize="none"
+                value={roll}
+                placeholder="Enter Roll number"
+                placeholderTextColor={Color.GRAY}
+                onChangeText={(text) => setrollno(String(text))}
+              />
+            </View>
 
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={batch}
-            onValueChange={(itemValue) => setBatch(itemValue)}
-            style={[
-              styles.picker,
-              batch === "" ? styles.pickerPlaceholder : null,
-            ]}
-          >
-            <Picker.Item label="Select Batch" value="" enabled={false} />
-            <Picker.Item label="CSE" value="CSE" />
-            <Picker.Item label="ECE" value="ECE" />
-            <Picker.Item label="DSAI" value="DSAI" />
-          </Picker>
-        </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={batch}
+                onValueChange={(itemValue) => setBatch(itemValue)}
+                style={[
+                  styles.picker,
+                  batch === "" ? styles.pickerPlaceholder : null,
+                ]}
+              >
+                <Picker.Item label="Select Batch" value="" enabled={false} />
+                <Picker.Item label="CSE" value="CSE" />
+                <Picker.Item label="ECE" value="ECE" />
+                <Picker.Item label="DSAI" value="DSAI" />
+              </Picker>
+            </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={password}
-            placeholder="Enter password"
-            placeholderTextColor={Color.GRAY}
-            secureTextEntry={true}
-            onChangeText={(text) => setPassword(String(text))}
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                value={password}
+                placeholder="Enter password"
+                placeholderTextColor={Color.GRAY}
+                secureTextEntry={true}
+                onChangeText={(text) => setPassword(String(text))}
+              />
+            </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={confirmPassword}
-            placeholder="Confirm password"
-            placeholderTextColor={Color.GRAY}
-            secureTextEntry={true}
-            onChangeText={(text) => setConfirmPassword(String(text))}
-          />
-        </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                value={confirmPassword}
+                placeholder="Confirm password"
+                placeholderTextColor={Color.GRAY}
+                secureTextEntry={true}
+                onChangeText={(text) => setConfirmPassword(String(text))}
+              />
+            </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={onSignUpPress}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>Continue</Text>
-            )}
-          </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={onSignUpPress}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={styles.buttonText}>Continue</Text>
+                )}
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => router.push("/auth/sign-in")}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => router.push("/auth/sign-in")}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>Sign In</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboardAvoidingContainer: {
+    flex: 1,
+  },
+  scrollViewContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -204,7 +220,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: "#e6f2ff",
     borderColor: "#cce0ff",
-    overflow: "hidden", // Ensures content stays inside the border
+    overflow: "hidden",
     marginBottom: 15,
   },
   picker: {
@@ -215,7 +231,6 @@ const styles = StyleSheet.create({
   pickerPlaceholder: {
     color: "#000",
   },
-
   textHeader: {
     fontSize: 24,
     fontWeight: "bold",

@@ -4,6 +4,7 @@ import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
+import Header from "../../components/header"; 
 
 export default function Verification() {
   const [isBiometricSupported, setIsBiometricSupported] = useState(null);
@@ -163,7 +164,7 @@ export default function Verification() {
         setIsVerificationComplete(true);
         setShowRecordedMessage(true);
         setTimeout(() => {
-          router.push("pages/recorded");
+          router.replace("pages/recorded");
         }, 2000);
       } else if (result.error === 'user_cancel') {
         console.log('User cancelled authentication');

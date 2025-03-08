@@ -15,7 +15,7 @@ export default function Index() {
           <Text style={styles.title}>Proxy Eviscerated</Text>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push("auth/userselect")}
+            onPress={() => router.replace("auth/userselect")}
           >
             <Text style={styles.buttonText}>Get Started</Text>
           </TouchableOpacity>

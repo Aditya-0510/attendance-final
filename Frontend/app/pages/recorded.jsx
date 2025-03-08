@@ -1,8 +1,15 @@
-import { StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Header from "../../components/header";
 
 export default function Recorded() {
   const router = useRouter();
@@ -47,27 +54,35 @@ export default function Recorded() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="#1E73E8" />
-      ) : error ? (
-        <Text style={styles.errorText}>{error}</Text>
-      ) : classDetails ? (
-        <>
-          <Text style={styles.title}>Attendance Recorded</Text>
-          <View style={styles.detailsContainer}>
-            <Text style={styles.text}>Class: {classDetails.Title}</Text>
-            <Text style={styles.text}>Date: {new Date().toLocaleDateString()}</Text>
-            <Text style={styles.text}>Duration: {classDetails.Hours} hours</Text>
-          </View>
-          <TouchableOpacity style={styles.button} onPress={() => router.push("(tabs)")}>
-            <Text style={styles.buttonText}>Go to Home</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <Text style={styles.text}>No class details available.</Text>
-      )}
-    </View>
+      
+      <View style={styles.container}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#1E73E8" />
+        ) : error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : classDetails ? (
+          <>
+            <Text style={styles.title}>Attendance Recorded</Text>
+            <View style={styles.detailsContainer}>
+              <Text style={styles.text}>Class: {classDetails.Title}</Text>
+              <Text style={styles.text}>
+                Date: {new Date().toLocaleDateString()}
+              </Text>
+              <Text style={styles.text}>
+                Duration: {classDetails.Hours} hours
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.replace("(tabs)")}
+            >
+              <Text style={styles.buttonText}>Go to Home</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Text style={styles.text}>No class details available.</Text>
+        )}
+      </View>
   );
 }
 

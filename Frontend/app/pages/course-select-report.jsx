@@ -1,84 +1,88 @@
-import { StyleSheet, Text, View ,TouchableOpacity,FlatList} from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FontAwesome } from "@expo/vector-icons"; // Import Icon for Back Button
-import Header from "../../components/Fheader"; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-
+import Header from "../../components/Fheader";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 export default function course() {
+  const router = useRouter();
+  const [courseList, setCourseList] = useState([]);
 
-    const router = useRouter();
-    const [courseList, setCourseList] = useState([]);
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
-    useEffect(() => {
-        fetchCourses();
-    }, []);
+  const getToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      return token;
+    } catch (error) {
+      console.error("Error retrieving token:", error);
+      return null;
+    }
+  };
 
-    const getToken = async () => {
-        try {
-            const token = await AsyncStorage.getItem('authToken');
-            return token;
-        } catch (error) {
-            console.error('Error retrieving token:', error);
-            return null;
-        }
-    };
+  const fetchCourses = async () => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        Alert.alert("Error", "Authentication token missing.");
+        return;
+      }
 
-    const fetchCourses = async () => {
-        try {
-            const token = await getToken();
-            if (!token) {
-                Alert.alert('Error', 'Authentication token missing.');
-                return;
-            }
+      const response = await axios.get("http://10.0.8.75:5000/admin/courses", {
+        headers: {
+          token: token,
+        },
+      });
 
-            const response = await axios.get('http://10.0.8.75:5000/admin/courses', {
-                headers: {
-                    'token': token,
-                },
-            });
+      console.log(response.data.courses);
 
-            console.log(response.data.courses)
-
-            if (response.data.isthere) {
-                setCourseList(response.data.courses);
-            } else {
-                setCourseList([]);
-            }
-        } catch (error) {
-            console.error('Error fetching courses:', error);
-            Alert.alert('Error', 'Failed to fetch courses.');
-        }
-    };
+      if (response.data.isthere) {
+        setCourseList(response.data.courses);
+      } else {
+        setCourseList([]);
+      }
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      Alert.alert("Error", "Failed to fetch courses.");
+    }
+  };
 
   return (
     <View>
-      <Header/>
+      <Header />
 
-<View style={styles.flatListContainer}>
-  <FlatList
-    data={courseList}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item }) => (
-      <TouchableOpacity 
-        style={[styles.courseCard]}
-        onPress={() =>
-            router.push({
-              pathname: 'pages/report',
-              params: { coursecode: item.coursecode, title: item.title }
-            })
-          }
-      >
-        <Text style={styles.courseName}>{item.title}</Text>
-        <Text style={styles.professorName}>{item.coursecode}</Text>
-      </TouchableOpacity>
-    )}
-  />
-</View>
+      <View style={styles.flatListContainer}>
+        <FlatList
+          data={courseList}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[styles.courseCard]}
+              onPress={() =>
+                router.push({
+                  pathname: "pages/report",
+                  params: { coursecode: item.coursecode, title: item.title },
+                })
+              }
+            >
+              <Text style={styles.courseName}>{item.title}</Text>
+              <Text style={styles.professorName}>{item.coursecode}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -101,7 +105,7 @@ const styles = StyleSheet.create({
   flatListContainer: {
     marginTop: 40, // Adjust this value as needed
   },
-  
+
   text: {
     fontSize: 20,
     fontWeight: "bold",
@@ -127,8 +131,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 5, // For Android shadow
   },
-  
-  
+
   selectedCard: {
     borderWidth: 3,
     borderColor: "#0066FF",

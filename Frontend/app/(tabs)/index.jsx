@@ -1,15 +1,52 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import React,{useEffect} from "react";
+import React,{useEffect,useState} from "react";
 import { useRouter} from "expo-router";
-import Header from "../../components/header"; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from 'axios'; 
 
 export default function index() {
     const router = useRouter();
+    const [username, setUsername] = useState("Guest");
+
+    const getToken = async () => {
+      try {
+        return await AsyncStorage.getItem('authToken');
+      } catch (error) {
+        console.error('Error retrieving token:', error);
+        return null;
+      }
+    };
+    const fetchUserData = async () => {
+      try {
+        const token = await getToken();
+        if (!token) {
+          Alert.alert('Error', 'Authentication token missing.');
+          return;
+        }
+  
+        const response = await axios.get("http://10.0.8.75:5000/user/profile", {
+          headers: { token }
+        });
+        console.log("data"+response.data.Name);
+        if (response.data) {
+          setUsername(response.data.Name || "Guest");
+        } else {
+          console.warn("Empty response from server.");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+        Alert.alert("Error", "Failed to load user details.");
+      }
+    };
+    useEffect(() => {
+        fetchUserData();
+      }, []);
+
+
   return (
     <>
     <View style={styles.container}>
-    <Header />
-    
+      <Text style={styles.welcomeText}>Welcome, {username}!</Text>
           <View style={styles.container1}>
             <View style={styles.imageContainerChart}>
               <Image
@@ -42,15 +79,6 @@ export default function index() {
 
 
     const styles = StyleSheet.create({
-        // signedOutContainer: {
-        //   flex: 1,
-        //   justifyContent: "center",
-        //   alignItems: "center",
-        //   padding: 20,
-        //   backgroundColor: "#D0C8F2",
-        //   width: '100%',
-        //   height: '100%'
-        // },
         container: {
           flex: 1,
           justifyContent: "center",
@@ -58,6 +86,18 @@ export default function index() {
           padding: 20,
           backgroundColor: "#ffffff",
         },
+        welcomeText: {
+          fontSize: 26,  
+          fontWeight: "bold",
+          textAlign: "center",
+          color: "#1E73E8",  
+          marginBottom: 20,
+          textTransform: "capitalize",  
+          shadowColor: "#000",
+          shadowOffset: { width: 2, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 3,
+      },
         imageContainer: {
           justifyContent: "center",
           alignItems: "center",
