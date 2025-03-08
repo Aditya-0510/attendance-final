@@ -81,6 +81,10 @@ export default function SignIn() {
                />
             </View>
 
+            <TouchableOpacity onPress={() => router.push("/auth/faculty-forgot-password")}>
+               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+
             <View style={styles.buttonContainer}>
                <TouchableOpacity style={[styles.button, isLoading && styles.disabledButton]} onPress={onSignInPress} disabled={isLoading}>
                   {isLoading ? (
@@ -124,6 +128,12 @@ const styles = StyleSheet.create({
       borderColor: '#cce0ff',
       fontSize: 16,
       color: '#000',
+   },
+   forgotPasswordText: {
+      textAlign: 'center',
+      color: 'gray',
+      textDecorationLine: 'underline',
+      marginBottom: 10,
    },
    buttonContainer: {
       alignItems: 'center',

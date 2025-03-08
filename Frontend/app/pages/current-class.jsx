@@ -12,6 +12,13 @@ export default function CurrentClass() {
     const [error, setError] = useState(null);
     const { batch,title } = useLocalSearchParams();
 
+    const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = String(now.getFullYear()).slice(-2); // Get last 2 digits of year
+        const formattedDate = `${day}-${month}-${year}`;
+
+
     const getToken = async () => {
         try {
             const token = await AsyncStorage.getItem('authToken');
@@ -97,7 +104,7 @@ export default function CurrentClass() {
 
                             <View style={styles.detailRow}>
                                 <Text style={styles.label}>Date:</Text>
-                                <Text style={styles.value}>{new Date(classDetails.date).toLocaleDateString() || "N/A"}</Text>
+                                <Text style={styles.value}>{formattedDate || "N/A"}</Text>
                             </View>
 
                             <View style={styles.detailRow}>

@@ -56,8 +56,8 @@ export default function SignIn() {
             router.replace('(tabs)');
          }
       } catch (error) {
-         console.error('Sign-in error:', error);
-         Alert.alert('Sign-in Failed', 'Something went wrong. Please try again.');
+         // console.error('Sign-in error:', error);
+         Alert.alert('Sign-in Failed', 'Something went wrong. Please try again.'+error);
       } finally {
          setIsLoading(false); // Stop loading
       }
@@ -98,6 +98,10 @@ export default function SignIn() {
                />
             </View>
 
+            <TouchableOpacity onPress={() => router.push("/auth/forgot-password")}>
+               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+
             <View style={styles.buttonContainer}>
                <TouchableOpacity style={[styles.button, isLoading && styles.disabledButton]} onPress={onSignInPress} disabled={isLoading}>
                   {isLoading ? (
@@ -123,6 +127,12 @@ const styles = StyleSheet.create({
       backgroundColor: '#ffffff',
       justifyContent: 'center',
    },
+   forgotPasswordText: {
+      textAlign: 'center',
+      color: 'gray',
+      textDecorationLine: 'underline',
+      marginBottom: 10,
+   },
    textHeader: {
       fontSize: 24,
       fontWeight: 'bold',
@@ -133,6 +143,7 @@ const styles = StyleSheet.create({
    inputContainer: {
       marginBottom: 15,
    },
+   
    textInput: {
       padding: 12,
       borderWidth: 1,

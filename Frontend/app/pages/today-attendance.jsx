@@ -43,11 +43,12 @@ export default function StudentTable() {
           return;
         }
 
+
         const response = await axios.get(
           "http://10.0.8.75:5000/admin/present",
           {
             headers: { token: token },
-            params: { batch: batch },
+            params: { batch: batch},
           }
         );
 

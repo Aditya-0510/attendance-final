@@ -74,6 +74,7 @@ userRouter.post('/verify-otp', async (req, res) => {
 
   userRouter.post("/forget-user",async function(req,res){
         const email=req.body.email;
+        console.log(email);
         try{
             const user= await UserModel.findOne({
                 email:email
@@ -89,7 +90,8 @@ userRouter.post('/verify-otp', async (req, res) => {
                     const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
                 
                     // Store user data against the OTP
-                    otpStore.set(otp);
+                    otpStore.set(parseInt(otp));
+                    
                 
                     await transporter.sendMail({
                       from: 'proxypakki@gmail.com',
@@ -98,7 +100,7 @@ userRouter.post('/verify-otp', async (req, res) => {
                       text: `Your OTP for email verification is: ${otp}`
                     });
                 
-                    res.send({ msg: 'OTP sent to email. Please verify.' });
+                    res.send({ msg: 'OTP sent to email. Please verify.' ,done:true});
                   } catch (err) {
                     res.status(500).send({ msg: 'Failed to send OTP' });
                   }
@@ -111,13 +113,15 @@ userRouter.post('/verify-otp', async (req, res) => {
         }
   })
   userRouter.post("/forget-verify",async function(req,res){
-    const { otp } = req.body.otp;
+    const {otp}= req.body;
+    console.log(otp);
     try {
-        const userData = otpStore.get(parseInt(otp));
+        const userData = otpStore.has(parseInt(otp));
+        console.log(userData);
         if (!userData) {
             return res.status(400).send({ msg: 'Invalid or expired OTP', success:false });
           }
-            otpStore.delete(parseInt(otp));
+            otpStore.delete(parseInt(otp),true);
             res.send({
                 msg:"otp verified successfully",
                 success:true
@@ -177,7 +181,7 @@ userRouter.post('/verify-otp', async (req, res) => {
                 user: user
             });
         } else {
-            return res.status(403).send({
+            return res.send({
                 msg: "invalid email or password"
             });
         }
@@ -296,7 +300,6 @@ userRouter.post('/mark-attendance',async function(req,res){
     let hour=req.body.hour;
     let user=req.user.id;
     let ispresent=req.body.ispresent;
-    let Date=req.body.date;
     console.log(hour);
     try{
         let course=await CourseModel.findOne({
@@ -331,7 +334,6 @@ userRouter.post('/mark-attendance',async function(req,res){
             coursecode:id,
             ispresent:ispresent,
             studentid:user,
-            Date:Date
 
       })
         res.send({

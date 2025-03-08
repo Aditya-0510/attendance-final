@@ -23,7 +23,36 @@ export default function Verification() {
         console.error('Error retrieving token:', error);
         return null;
     }
-};
+  };
+
+  const fetchDetails = async() => {
+    try {
+      const token = await getToken();
+      if (!token) {
+          Alert.alert('Error', 'Authentication token missing.');
+          return;
+      }
+      console.log("token"+token);
+      const response = await axios.get(
+        'http://10.0.8.75:5000/user/checker',
+        {
+            headers: {
+                'token': token,
+            },
+        });
+
+      const classData = response.data.clas;
+      setClassDetails(classData); // Update classDetails state
+      console.log('Class details:', classData);
+    } catch (error) {
+      console.error('Error fetching class details:', error);
+      Alert.alert('Error', 'Failed to fetch class details.');
+    }
+  };
+
+  useEffect(() => {
+    fetchDetails();
+  }, []);
 
   useEffect(() => {
     checkBiometricSupport();
@@ -116,7 +145,6 @@ export default function Verification() {
 
       const result = await LocalAuthentication.authenticateAsync(authOptions);
       console.log('Authentication result:', result);
-      // console.log(result.success)
 
       if (result.success) {
         const token = await getToken();
@@ -124,40 +152,30 @@ export default function Verification() {
             Alert.alert('Error', 'Authentication token missing.');
             return;
         }
-        console.log("token"+token)
-        const response = await axios.get(
-          'http://10.0.8.75:5000/user/checker',
+
+        if (!classDetails) {
+            Alert.alert('Error', 'Class details not available.');
+            return;
+        }
+
+
+        const newDetails = {
+          coursecode: classDetails.Coursecode,
+          hour: classDetails.Hours,
+          ispresent: result.success,
+        };
+        
+        console.log(newDetails);
+
+        await axios.post(
+          'http://10.0.8.75:5000/user/mark-attendance',
+          newDetails,
           {
               headers: {
                   'token': token,
               },
           }
-      );
-
-      const classData = response.data.clas;
-      setClassDetails(classData); // Update classDetails state
-      console.log('Class details:', classData);
-
-      const newDetails = {
-        coursecode: classDetails.Coursecode,
-        hour: classDetails.Hours,
-        ispresent: result.success,
-      };
-      
-      console.log(newDetails)
-
-       await axios.post(
-        'http://10.0.8.75:5000/user/mark-attendance',
-        newDetails,
-        {
-            headers: {
-                'token': token,
-            },
-        }
-    );
-
-    
-
+        );
 
         console.log('Authentication successful');
         setIsAuthenticated(true);

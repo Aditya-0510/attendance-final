@@ -96,6 +96,89 @@ adminRouter.post('/verify-otp', async (req, res) => {
 
 // })
 
+
+adminRouter.post("/forget-admin",async function(req,res){
+        const email=req.body.email;
+        try{
+            const admin= await AdminModel.findOne({
+                email:email
+            })
+            if(!admin){
+                res.send({
+                    msg:"Email not registered",
+                    done:false
+                })
+            }
+            else{
+                try {
+                    const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
+                
+                    // Store user data against the OTP
+                    otpStore.set(parseInt(otp));
+                
+                    await transporter.sendMail({
+                      from: 'proxypakki@gmail.com',
+                      to: email,
+                      subject: 'Email Verification OTP',
+                      text: `Your OTP for email verification is: ${otp}`
+                    });
+                
+                    res.send({ msg: 'OTP sent to email. Please verify.',done:true });
+                  } catch (err) {
+                    res.status(500).send({ msg: 'Failed to send OTP' });
+                  }
+            }
+        }
+        catch(e){
+            return res.status(500).send({
+                msg:"Internal server error"
+            })
+        }
+  })
+  adminRouter.post("/forget-verify-admin",async function(req,res){
+    const { otp } = req.body;
+    try {
+        const adminData = otpStore.has(parseInt(otp));
+        if (!adminData) {
+            return res.status(400).send({ msg: 'Invalid or expired OTP', success:false });
+          }
+            otpStore.delete(parseInt(otp));
+            res.send({
+                msg:"otp verified successfully",
+                success:true
+            })
+    }
+    catch(e){
+        res.status(500).send({
+            msg:"Internal server error"
+        })
+    }
+
+  })
+  adminRouter.post("/reset-admin",async function(req,res){
+    const password=req.body.password
+    const email=req.body.email;
+    const hashedPass = await bcrypt.hash(password, 5);
+    try{
+        await AdminModel.updateOne(
+            { email: email },
+            { $set: { password: hashedPass } } 
+        );
+        res.send({
+            msg:"Password updated sucessfully"
+        })
+    }
+    catch(e){
+        res.status(500).send({
+            msg:"Internal server error"
+        })
+    }
+  })
+
+
+
+
+
 adminRouter.post("/signin",async function(req,res){
     const email=req.body.email;
     const password=req.body.password;
@@ -136,9 +219,9 @@ catch(e){
 adminRouter.use(auth_admin);
 
 adminRouter.get("/present",async function(req,res){
-    
     const batch=req.query.batch;
-
+    
+    console.log(batch);
     try{
         let attendance=[];
         const user=await UserModel.find({
@@ -147,7 +230,7 @@ adminRouter.get("/present",async function(req,res){
         for(let i=0;i<user.length;i++){
             let userId=user[i]._id
             const student = await MarkedModel.findOne({
-                studentid:userId
+                studentid:userId,
             })
             if(student){
                 attendance.push({
@@ -161,12 +244,18 @@ adminRouter.get("/present",async function(req,res){
                     attendance:"Absent"
                 })
             }
+
+            await MarkedModel.deleteOne({
+                studentid:userId
+            });
         }
+
         console.log(attendance);
         res.send(attendance);
     }
     catch(e){
-        res.status(500).send({
+        console.log(e);
+        res.status(403).send({
             msg:"internal server error"
         })
     }
@@ -268,8 +357,8 @@ adminRouter.post('/start-class',async function(req,res){
             coursecode:coursecode,
         })
         let thour=course.total_hours;
-        thour=thour+parseInt(hours)
-        console.log(hours);
+        console.log(thour);
+        thour=thour+parseFloat(hours)
 
      await CourseModel.updateOne(
         { coursecode: coursecode }, // Find by coursecode
