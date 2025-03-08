@@ -174,15 +174,18 @@ adminRouter.get("/present",async function(req,res){
 })
 adminRouter.get('/get-all',async function(req,res){
     const coursecode=req.query.coursecode;
+    console.log(coursecode);
     try{
         const course=await CourseModel.findOne({
             coursecode:coursecode
         })
         const courseid=course._id
+        console.log(courseid);
         const totalhours=course.total_hours
         const users=await AttendanceModel.find({
             coursecode:courseid
         })
+        console.log(users);
         let data=[];
         for(let i=0;i<users.length;i++){
             let hour_attended=users[i].hours
@@ -200,7 +203,7 @@ adminRouter.get('/get-all',async function(req,res){
         res.send(data);
     }
     catch(e){
-        return res.status(500).send({
+        return res.status(404).send({
             msg:"Internal server error"
         })
     }
@@ -216,7 +219,7 @@ adminRouter.get('/profile',async function(req,res){
     res.send(admin)
 }
 catch(e){
-    res.status(500).send({
+    return res.send({
         msg:"internal server error"
     })
 }

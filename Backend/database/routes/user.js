@@ -72,6 +72,83 @@ userRouter.post('/verify-otp', async (req, res) => {
   });
   
 
+  userRouter.post("/forget-user",async function(req,res){
+        const email=req.body.email;
+        try{
+            const user= await UserModel.findOne({
+                email:email
+            })
+            if(!user){
+                res.send({
+                    msg:"Email not registered",
+                    done:false
+                })
+            }
+            else{
+                try {
+                    const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
+                
+                    // Store user data against the OTP
+                    otpStore.set(otp);
+                
+                    await transporter.sendMail({
+                      from: 'proxypakki@gmail.com',
+                      to: email,
+                      subject: 'Email Verification OTP',
+                      text: `Your OTP for email verification is: ${otp}`
+                    });
+                
+                    res.send({ msg: 'OTP sent to email. Please verify.' });
+                  } catch (err) {
+                    res.status(500).send({ msg: 'Failed to send OTP' });
+                  }
+            }
+        }
+        catch(e){
+            return res.status(500).send({
+                msg:"Internal server error"
+            })
+        }
+  })
+  userRouter.post("/forget-verify",async function(req,res){
+    const { otp } = req.body.otp;
+    try {
+        const userData = otpStore.get(parseInt(otp));
+        if (!userData) {
+            return res.status(400).send({ msg: 'Invalid or expired OTP', success:false });
+          }
+            otpStore.delete(parseInt(otp));
+            res.send({
+                msg:"otp verified successfully",
+                success:true
+            })
+    }
+    catch(e){
+        res.status(500).send({
+            msg:"Internal server error"
+        })
+    }
+
+  })
+  userRouter.post("/reset",async function(req,res){
+    const password=req.body.password
+    const email=req.body.email;
+    const hashedPass = await bcrypt.hash(password, 5);
+    try{
+        await UserModel.updateOne(
+            { email: email },
+            { $set: { password: hashedPass } } 
+        );
+        res.send({
+            msg:"Password updated sucessfully"
+        })
+    }
+    catch(e){
+        res.status(500).send({
+            msg:"Internal server error"
+        })
+    }
+  })
   userRouter.post("/signin", async function(req, res) {
     const email = req.body.email;
     const password = req.body.password;
