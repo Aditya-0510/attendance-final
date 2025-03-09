@@ -1,17 +1,15 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image, Platform, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as LocalAuthentication from "expo-local-authentication";
-import { useRouter,Stack } from "expo-router";
+import { useRouter, Stack } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios'
-import Header from "../../components/header";
+import axios from 'axios';
 import Constants from 'expo-constants';
 
 const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL; 
 
 export default function Verification() {
-  const [isBiometricSupported, setIsBiometricSupported] = useState(null);
-  const [biometricType, setBiometricType] = useState(null);
+  const [isAuthenticationSupported, setIsAuthenticationSupported] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isVerificationComplete, setIsVerificationComplete] = useState(false);
   const [showRecordedMessage, setShowRecordedMessage] = useState(false);
@@ -43,7 +41,6 @@ export default function Verification() {
                 'token': token,
             },
         });
-
       const classData = response.data.clas;
       setClassDetails(classData); // Update classDetails state
       console.log('Class details:', classData);
@@ -58,57 +55,49 @@ export default function Verification() {
   }, []);
 
   useEffect(() => {
-    checkBiometricSupport();
+    checkAuthenticationSupport();
   }, []);
 
-  const checkBiometricSupport = async () => {
+  const checkAuthenticationSupport = async () => {
     try {
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      console.log('Biometric hardware available:', compatible);
-      
-      if (!compatible) {
-        setIsBiometricSupported(false);
-        Alert.alert('Error', 'Biometric hardware not available');
-        return;
-      }
-
-      const enrolled = await LocalAuthentication.isEnrolledAsync();
-      console.log('Biometrics enrolled:', enrolled);
-      
-      if (!enrolled) {
-        setIsBiometricSupported(false);
-        const message = Platform.OS === 'ios' 
-          ? 'Please set up Face ID in your device settings to use this feature.'
-          : 'Please set up fingerprint or face recognition in your device settings to use this feature.';
-        Alert.alert('Biometric Authentication Not Set Up', message, [{ text: 'OK' }]);
-        return;
-      }
-
-      const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
-      console.log('Supported authentication types:', types);
-      setIsBiometricSupported(true);
-
       if (Platform.OS === 'ios') {
-        if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
-          setBiometricType("Face ID");
-        } else {
-          setIsBiometricSupported(false);
-          Alert.alert('Error', 'Face ID is required for this feature');
-        }
+        // For iOS, we'll check if device authentication is available
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        console.log('Authentication hardware available:', compatible);
+        
+        // Set authentication as supported regardless of biometric availability
+        // since we want to use passcode
+        setIsAuthenticationSupported(true);
       } else {
-        if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
-          setBiometricType("Fingerprint");
-        } else if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
-          setBiometricType("Face Recognition");
-        } else {
-          setIsBiometricSupported(false);
-          Alert.alert('Error', 'Biometric authentication is not available');
+        // For Android, we'll still use biometric authentication
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        console.log('Biometric hardware available:', compatible);
+        
+        if (!compatible) {
+          setIsAuthenticationSupported(false);
+          Alert.alert('Error', 'Biometric hardware not available');
+          return;
         }
+
+        const enrolled = await LocalAuthentication.isEnrolledAsync();
+        console.log('Biometrics enrolled:', enrolled);
+        
+        if (!enrolled) {
+          setIsAuthenticationSupported(false);
+          Alert.alert(
+            'Biometric Authentication Not Set Up', 
+            'Please set up fingerprint or face recognition in your device settings to use this feature.',
+            [{ text: 'OK' }]
+          );
+          return;
+        }
+
+        setIsAuthenticationSupported(true);
       }
     } catch (error) {
-      console.error('Error checking biometric support:', error);
-      setIsBiometricSupported(false);
-      Alert.alert('Error', 'Failed to initialize biometric authentication');
+      console.error('Error checking authentication support:', error);
+      setIsAuthenticationSupported(false);
+      Alert.alert('Error', 'Failed to initialize authentication');
     }
   };
 
@@ -116,52 +105,46 @@ export default function Verification() {
     if (isVerificationComplete) return;
     
     try {
-      const available = await LocalAuthentication.hasHardwareAsync();
-      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      let authOptions;
       
-      if (!available || !enrolled) {
-        Alert.alert(
-          'Authentication Error',
-          'Biometric authentication is not available or not set up.',
-          [{ text: 'OK' }]
-        );
-        return;
+      if (Platform.OS === 'ios') {
+        // iOS-specific options to use device passcode
+        authOptions = {
+          promptMessage: 'Enter your passcode to verify attendance',
+          disableDeviceFallback: false,
+          fallbackLabel: '',
+          cancelLabel: 'Cancel',
+          // Enable device credentials (passcode)
+          deviceCredentialAllowed: true
+        };
+      } else {
+        // Android-specific options
+        authOptions = {
+          promptMessage: 'Authenticate to verify attendance',
+          disableDeviceFallback: true,
+          cancelLabel: "Cancel",
+          fallbackLabel: '',
+          requireConfirmation: false,
+          sensitiveTransaction: true,
+          allowDeviceCredentials: false
+        };
       }
-
-      const authOptions = {
-        promptMessage: Platform.OS === 'ios' 
-          ? 'Authenticate with Face ID'
-          : `Authenticate with ${biometricType}`,
-        disableDeviceFallback: true,
-        cancelLabel: "Cancel",
-        fallbackLabel: '',
-        requireConfirmation: false,
-        ...Platform.select({
-          android: {
-            allowDeviceCredentials: false,
-            sensitiveTransaction: true,
-          }
-        })
-      };
-
+      
       console.log('Starting authentication with options:', authOptions);
-
       const result = await LocalAuthentication.authenticateAsync(authOptions);
       console.log('Authentication result:', result);
-
+      
       if (result.success) {
         const token = await getToken();
         if (!token) {
             Alert.alert('Error', 'Authentication token missing.');
             return;
         }
-
         if (!classDetails) {
             Alert.alert('Error', 'Class details not available.');
             return;
         }
-
-
+        
         const newDetails = {
           coursecode: classDetails.Coursecode,
           hour: classDetails.Hours,
@@ -169,7 +152,6 @@ export default function Verification() {
         };
         
         console.log(newDetails);
-
         await axios.post(
           `${API_URL}/user/mark-attendance`,
           newDetails,
@@ -179,7 +161,7 @@ export default function Verification() {
               },
           }
         );
-
+        
         console.log('Authentication successful');
         setIsAuthenticated(true);
         setIsVerificationComplete(true);
@@ -194,7 +176,7 @@ export default function Verification() {
         setIsAuthenticated(false);
         Alert.alert(
           'Authentication Failed',
-          'Please try again using biometric authentication only.',
+          'Please try again to verify your attendance.',
           [{ text: 'OK' }]
         );
       }
@@ -223,40 +205,40 @@ export default function Verification() {
         resizeMode="contain" 
       />
       <Text style={styles.title}>
-        {Platform.OS === 'ios' ? 'Face ID Authentication' : 'Biometric Authentication'}
+        {Platform.OS === 'ios' ? 'Passcode Authentication' : 'Biometric Authentication'}
       </Text>
-
+      
       {showRecordedMessage ? (
         <View style={styles.successContainer}>
           <Text style={styles.successText}>✅ Attendance Recorded Successfully!</Text>
           <Text style={styles.redirectText}>Redirecting...</Text>
         </View>
-      ) : isBiometricSupported === null ? (
-        <Text style={styles.text}>Checking for biometric support...</Text>
-      ) : isBiometricSupported ? (
+      ) : isAuthenticationSupported === null ? (
+        <Text style={styles.text}>Checking for authentication support...</Text>
+      ) : isAuthenticationSupported ? (
         <View>
           <Text style={styles.text}>
             {Platform.OS === 'ios' 
-              ? 'Please authenticate using Face ID'
-              : `Please authenticate using your ${biometricType}`}
+              ? 'Please authenticate using your device passcode'
+              : 'Please authenticate using your biometrics'}
           </Text>
           <TouchableOpacity 
             style={styles.button} 
             onPress={authenticateUser}
           >
             <Text style={styles.buttonText}>
-              {Platform.OS === 'ios' ? 'Use Face ID' : 'Authenticate'}
+              {Platform.OS === 'ios' ? 'Use Passcode' : 'Authenticate'}
             </Text>
           </TouchableOpacity>
         </View>
       ) : (
         <Text style={styles.text}>
           {Platform.OS === 'ios' 
-            ? "Face ID is not available or not enrolled on this device."
+            ? "Authentication is not available on this device."
             : "Biometric authentication is not available on this device."}
         </Text>
       )}
-
+      
       {!isAuthenticated && !isVerificationComplete && (
         <TouchableOpacity 
           style={styles.logoutButton} 

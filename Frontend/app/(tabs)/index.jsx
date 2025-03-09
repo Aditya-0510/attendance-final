@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E73E8",
     paddingVertical: 12,
     paddingHorizontal: 30,
-    borderRadius: 50,
+    borderRadius: 25,
     width: "85%", // Ensuring both buttons have the same width
     alignItems: "center",
     elevation: 3,

@@ -1,24 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert,ActivityIndicator } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import axios from 'axios';
-import Constants from 'expo-constants';
-
-const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function MenuScreen() {
   const [username, setUsername] = useState("Guest");
   const [email, setEmail] = useState("Guest@iiitdwd.ac.in");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   // Get auth token from AsyncStorage
   const getToken = async () => {
     try {
-      return await AsyncStorage.getItem('authToken');
+      return await AsyncStorage.getItem("authToken");
     } catch (error) {
-      console.error('Error retrieving token:', error);
+      console.error("Error retrieving token:", error);
       return null;
     }
   };
@@ -26,33 +22,25 @@ export default function MenuScreen() {
   // Fetch user profile data from the backend
   const fetchUserData = async () => {
     try {
-      const token = await getToken();
-      if (!token) {
-        Alert.alert('Error', 'Authentication token missing.');
-        return;
-      }
+      const name = await AsyncStorage.getItem("name");
+      const em = await AsyncStorage.getItem("rollno");
 
-      const response = await axios.get(`${API_URL}/admin/profile`, {
-        headers: { token }
-      });
-      console.log("data"+response.data.Name);
-      if (response.data) {
-        setUsername(response.data.Name || "Guest");
-        setEmail(response.data.email || "Guest@iiitdwd.ac.in");
-      } else {
-        console.warn("Empty response from server.");
-      }
+      setUsername(name);
+      setEmail(em);
     } catch (error) {
       console.error("Error fetching user details:", error);
       Alert.alert("Error", "Failed to load user details.");
     }
   };
 
-  // Handle sign-out by clearing auth data and navigating
+  fetchUserData();
+
   const handleSignOut = async () => {
     try {
+      setLoading(true);
       await AsyncStorage.removeItem("authToken");
-      // await AsyncStorage.removeItem("user");
+      await AsyncStorage.removeItem("name");
+      await AsyncStorage.removeItem("email");
       router.replace("/auth/userselect");
     } catch (error) {
       console.error("Error signing out:", error);
@@ -60,20 +48,16 @@ export default function MenuScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
   return (
     <View style={styles.mainContainer}>
       <View style={styles.container}>
         <View style={styles.profileContainer}>
           <View style={styles.profileImage}>
-            <FontAwesome 
-              name="user" 
-              size={50} 
-              color="#1E73E8" 
-              style={{ textAlign: "center" }} 
+            <FontAwesome
+              name="user"
+              size={50}
+              color="#1E73E8"
+              style={{ textAlign: "center" }}
             />
           </View>
           <Text style={styles.profileName}>{username} </Text>
@@ -81,8 +65,16 @@ export default function MenuScreen() {
         </View>
 
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-            <Text style={styles.buttonText}>Sign Out</Text>
+          <TouchableOpacity
+            style={[styles.button, loading && styles.disabledButton]}
+            onPress={handleSignOut}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Sign Out</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>

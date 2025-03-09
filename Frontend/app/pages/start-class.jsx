@@ -50,6 +50,7 @@ export default function ClassDetails() {
     const fetchCourses = async () => {
       try {
         const token = await getToken();
+        console.log(token);
         if (!token) {
           Alert.alert("Error", "Authentication token missing.");
           return;

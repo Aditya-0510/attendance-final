@@ -13,6 +13,16 @@ export default function Index() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const getToken = async () => {
+        try {
+          const token = await AsyncStorage.getItem("authToken");
+          return token;
+        } catch (error) {
+          console.error("Error retrieving token:", error);
+          return null;
+        }
+      };
+
     const getUser = async () => {
         try {
             return await AsyncStorage.getItem('name');
