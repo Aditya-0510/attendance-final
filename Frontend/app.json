@@ -31,7 +31,8 @@
           "image": "./assets/images/logo-new-edited.jpg",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#D0C8F2"
+          
         }
       ]
     ],
