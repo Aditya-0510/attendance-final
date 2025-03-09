@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const cors = require('cors');
+
 
 adminRouter.use(cors({
     origin: 'https://proxy-pakki.onrender.com', // Allow only this origin

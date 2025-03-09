@@ -16,8 +16,6 @@ const {CourseModel}=require('./db')
 
 const app = express();
 app.use(express.json());
-const cors = require('cors');
-
 app.use(cors({
     origin: 'https://proxy-pakki.onrender.com', // Allow only this origin
 }));
