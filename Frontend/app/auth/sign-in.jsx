@@ -45,17 +45,22 @@ export default function SignIn() {
 
          if (success) {
             const token = response.data.token;
+            const user = response.data.user
 
-            const storeToken = async (token) => {
+            const storeToken = async (token,user) => {
                try {
                   await AsyncStorage.setItem('authToken', token);
+                  await AsyncStorage.setItem('email',user.email)
+                  await AsyncStorage.setItem('name',user.Name)
+                  await AsyncStorage.setItem('rollno',user.rollno)
+                  await AsyncStorage.setItem('batch',user.Batch)
                   console.log('Token stored successfully!');
                } catch (error) {
                   console.error('Error storing token:', error);
                }
             };
 
-            await storeToken(token);
+            await storeToken(token,user);
             router.replace('(tabs)');
          }
       } catch (error) {

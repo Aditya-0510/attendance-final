@@ -13,41 +13,33 @@ export default function Index() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const getToken = async () => {
+    const getUser = async () => {
         try {
-            return await AsyncStorage.getItem('authToken');
+            return await AsyncStorage.getItem('name');
         } catch (error) {
-            console.error('Error retrieving token:', error);
+            console.error('Error retrieving name:', error);
             return null;
         }
     };
 
     const fetchUserData = async () => {
         try {
-            const token = await getToken();
-            if (!token) {
-                Alert.alert('Error', 'Authentication token missing.');
+            const user = await getUser();
+            console.log(user);
+            setUsername(user);
+            if (!user) {
+                Alert.alert('Error', 'User missing');
                 return;
             }
-
-            const response = await axios.get(`${API_URL}/admin/profile`, {
-                headers: { token }
-            });
-
-            if (response.data) {
-                setUsername(response.data.Name || "Guest");
-            } else {
-                console.warn("Empty response from server.");
-            }
+           
         } catch (error) {
             console.error("Error fetching user details:", error);
             Alert.alert("Error", "Failed to load user details.");
         }
     };
 
-    useEffect(() => {
-        fetchUserData();
-    }, []);
+    fetchUserData();
+
 
     const fetchClassDetails = async () => {
         setLoading(true);

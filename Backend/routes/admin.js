@@ -214,6 +214,7 @@ adminRouter.post("/signin",async function(req,res){
         res.send({
             msg:"logged in sucessfully",
             token:token,
+            admin:admin,
             success:true
         })
     }

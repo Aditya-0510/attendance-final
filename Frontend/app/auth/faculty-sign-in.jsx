@@ -28,17 +28,20 @@ export default function SignIn() {
 
          if (success) {
             const token = response.data.token;
+            const admin = response.data.admin
             
             const storeToken = async (token) => {
                try {
                   await AsyncStorage.setItem('authToken', token);
+                  await AsyncStorage.setItem('name', admin.Name);
+                  await AsyncStorage.setItem('email', admin.email);
                   console.log('Token stored successfully!');
                } catch (error) {
                   console.error('Error storing token:', error);
                }
             };
                
-            await storeToken(token);
+            await storeToken(token,admin);
             router.replace('(faculty)');
          }
       } catch (error) {

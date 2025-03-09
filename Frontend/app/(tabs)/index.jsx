@@ -1,50 +1,36 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import React,{useEffect,useState} from "react";
+import React,{useState} from "react";
 import { useRouter} from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from 'axios'; 
-import Constants from 'expo-constants';
-
-const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function index() {
     const router = useRouter();
     const [username, setUsername] = useState("Guest");
 
-    const getToken = async () => {
+    const getUser = async () => {
       try {
-        return await AsyncStorage.getItem('authToken');
+        return await AsyncStorage.getItem('name');
       } catch (error) {
-        console.error('Error retrieving token:', error);
+        console.error('Error retrieving user details:', error);
         return null;
       }
     };
     const fetchUserData = async () => {
       try {
-        const token = await getToken();
-        if (!token) {
-          Alert.alert('Error', 'Authentication token missing.');
+        const user = await getUser();
+        console.log(user);
+        setUsername(user)
+        if (!user) {
+          Alert.alert('Error', 'User missing');
           return;
-        }
-  
-        const response = await axios.get(`${API_URL}/user/profile`, {
-          headers: { token }
-        });
-        console.log("data"+response.data.Name);
-        if (response.data) {
-          setUsername(response.data.Name || "Guest");
-        } else {
-          console.warn("Empty response from server.");
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
         Alert.alert("Error", "Failed to load user details.");
       }
     };
-    useEffect(() => {
-        fetchUserData();
-      }, []);
-
+    
+    fetchUserData();
 
   return (
     <>

@@ -54,7 +54,6 @@ export default function StudentTable() {
     const fetchStudents = async () => {
       try {
         setLoading(true);
-        await getStoredData();
         const token = await getToken();
         if (!token) {
           Alert.alert("Error", "Authentication token missing.");
@@ -66,8 +65,8 @@ export default function StudentTable() {
         const response = await axios.get(
           `${API_URL}/admin/present`,
           {
-            headers: { token: token },
-            params: { batch: batch},
+            headers: { 'token': token },
+            params: { 'batch': batch},
           }
         );
 

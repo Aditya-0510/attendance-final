@@ -18,47 +18,36 @@ const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 export default function MenuScreen() {
   const [username, setUsername] = useState("Guest");
   const [rollno, setRollno] = useState("No Roll number");
-  const [loading, setLoading] = useState(false); // 🔴 Added loading state
+  const [loading, setLoading] = useState(false); 
 
-  // Get auth token from AsyncStorage
   const getToken = async () => {
     try {
-      return await AsyncStorage.getItem("authToken");
+        const token = await AsyncStorage.getItem('authToken');
+        return token;
+    } catch (error) {
+        console.error('Error retrieving token:', error);
+        return null;
+    }
+};
+
+  const getDetails = async () => {
+    try {
+      const name =  await AsyncStorage.getItem("name");
+      const rn =  await AsyncStorage.getItem("rollno");
+
+      setUsername(name)
+      setRollno(rn)
     } catch (error) {
       console.error("Error retrieving token:", error);
       return null;
     }
   };
 
-  // Fetch user profile data from the backend
-  const fetchUserData = async () => {
-    try {
-      const token = await getToken();
-      if (!token) {
-        Alert.alert("Error", "Authentication token missing.");
-        return;
-      }
+  getDetails();
 
-      const response = await axios.get(`${API_URL}/user/profile`, {
-        headers: { token },
-      });
-
-      if (response.data) {
-        setUsername(response.data.Name || "Guest");
-        setRollno(response.data.rollno || "No Roll number");
-      } else {
-        console.warn("Empty response from server.");
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      Alert.alert("Error", "Failed to load user details.");
-    }
-  };
-
-  // Handle sign-out by clearing auth data and navigating
   const handleSignOut = async () => {
     try {
-      setLoading(true); // 🔴 Start loading state
+      setLoading(true); 
       const token = await getToken();
       if (!token) {
         Alert.alert("Error", "Authentication token missing.");
@@ -77,19 +66,19 @@ export default function MenuScreen() {
 
       if (!ongoing) {
         await AsyncStorage.removeItem("authToken");
+        await AsyncStorage.removeItem("name");
+        await AsyncStorage.removeItem("email");
+        await AsyncStorage.removeItem("batch");
+        await AsyncStorage.removeItem("rollno");
         router.replace("/auth/userselect");
       }
     } catch (error) {
       console.error("Error signing out:", error);
       Alert.alert("Error", "Failed to sign out.");
     } finally {
-      setLoading(false); // 🔴 Stop loading state
+      setLoading(false); 
     }
   };
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
 
   return (
     <View style={styles.mainContainer}>
@@ -109,12 +98,12 @@ export default function MenuScreen() {
 
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
-            style={[styles.button, loading && styles.disabledButton]} // 🔴 Disable button when loading
+            style={[styles.button, loading && styles.disabledButton]} 
             onPress={handleSignOut}
-            disabled={loading} // 🔴 Prevent multiple clicks
+            disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator size="small" color="white" /> // 🔴 Show loader
+              <ActivityIndicator size="small" color="white" />
             ) : (
               <Text style={styles.buttonText}>Sign Out</Text>
             )}

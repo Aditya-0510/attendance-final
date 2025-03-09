@@ -11,6 +11,7 @@ const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 export default function MenuScreen() {
   const [username, setUsername] = useState("Guest");
   const [email, setEmail] = useState("Guest@iiitdwd.ac.in");
+  const [loading, setLoading] = useState(false); 
 
   // Get auth token from AsyncStorage
   const getToken = async () => {
