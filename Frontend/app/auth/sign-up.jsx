@@ -32,7 +32,7 @@ export default function SignUpScreen() {
   
   const batches = ["CSE", "ECE", "DSAI"];
 
-  const validateEmailDomain = (email: string) => {
+  const validateEmailDomain = (email) => {
     return email.endsWith("@iiitdwd.ac.in");
   };
 

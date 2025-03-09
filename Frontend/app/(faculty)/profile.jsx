@@ -75,8 +75,8 @@ export default function MenuScreen() {
               style={{ textAlign: "center" }} 
             />
           </View>
-          <Text style={styles.profileName}>{username}</Text>
-          <Text style={styles.profileRole}>{email}</Text>
+          <Text style={styles.profileName}>{username} </Text>
+          <Text style={styles.profileRole}>{email} </Text>
         </View>
 
         <View style={styles.buttonsContainer}>
