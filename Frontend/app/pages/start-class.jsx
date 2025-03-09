@@ -132,6 +132,15 @@ export default function ClassDetails() {
     }
   };
 
+  const storeBatch = async (batch) => {
+    try {
+      await AsyncStorage.setItem("selectedBatch", batch);
+      console.log(batch);
+    } catch (error) {
+      console.error("Error storing batch:", error);
+    }
+  };
+
   const renderCourseItem = ({ item }) => {
     console.log("Course item clicked:", item); // Debug log
     return (
@@ -167,8 +176,9 @@ export default function ClassDetails() {
   const renderBatchItem = ({ item }) => (
     <TouchableOpacity
       style={styles.modalItem}
-      onPress={() => {
+      onPress={async() => {
         setBatch(item);
+        await storeBatch(item);
         setBatchModalVisible(false);
       }}
     >

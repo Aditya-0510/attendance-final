@@ -71,6 +71,35 @@ export default function Notification() {
     fetchOngoingClass();
   }, []);
 
+  const attendanceChecker = async ()=>{
+    setLoading(true);
+    try {
+      const token = await getToken();
+      if (!token) {
+        Alert.alert('Error', 'Authentication token missing.');
+        return;
+      }
+
+      const response = await axios.get(`${API_URL}/user/attendance-checker`, {
+        headers: { 'token': token }
+      });
+      const marked = response.data.marked;
+      console.log(response.data);
+      console.log(marked);
+      if (marked) {
+       Alert.alert(response.data.msg)
+      }
+      else{
+        router.push("user-pages/location")
+      }
+    } catch (error) {
+      console.error('Error fetching ongoing class:', error);
+      setError('Failed to fetch class data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
   <Stack.Screen
@@ -105,7 +134,7 @@ export default function Notification() {
       ) : ongoingClass ? (
         <TouchableOpacity 
           style={styles.card}
-          onPress={() => router.push("user-pages/location")}
+          onPress={attendanceChecker}
         >
           <Text style={styles.header}>Class Started</Text>
 

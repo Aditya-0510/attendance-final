@@ -1,23 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import axios from 'axios';
-import Constants from 'expo-constants';
+import axios from "axios";
+import Constants from "expo-constants";
 
 const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function MenuScreen() {
   const [username, setUsername] = useState("Guest");
   const [rollno, setRollno] = useState("No Roll number");
+  const [loading, setLoading] = useState(false); // 🔴 Added loading state
 
   // Get auth token from AsyncStorage
   const getToken = async () => {
     try {
-      return await AsyncStorage.getItem('authToken');
+      return await AsyncStorage.getItem("authToken");
     } catch (error) {
-      console.error('Error retrieving token:', error);
+      console.error("Error retrieving token:", error);
       return null;
     }
   };
@@ -27,14 +35,14 @@ export default function MenuScreen() {
     try {
       const token = await getToken();
       if (!token) {
-        Alert.alert('Error', 'Authentication token missing.');
+        Alert.alert("Error", "Authentication token missing.");
         return;
       }
 
       const response = await axios.get(`${API_URL}/user/profile`, {
-        headers: { token }
+        headers: { token },
       });
-      console.log("data"+response.data.Name);
+
       if (response.data) {
         setUsername(response.data.Name || "Guest");
         setRollno(response.data.rollno || "No Roll number");
@@ -50,11 +58,32 @@ export default function MenuScreen() {
   // Handle sign-out by clearing auth data and navigating
   const handleSignOut = async () => {
     try {
-      await AsyncStorage.removeItem("authToken");
-      router.replace("/auth/userselect");
+      setLoading(true); // 🔴 Start loading state
+      const token = await getToken();
+      if (!token) {
+        Alert.alert("Error", "Authentication token missing.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        `${API_URL}/user/signout`,
+        {},
+        { headers: { token } }
+      );
+
+      const ongoing = response.data.ongoing;
+      Alert.alert(response.data.msg);
+
+      if (!ongoing) {
+        await AsyncStorage.removeItem("authToken");
+        router.replace("/auth/userselect");
+      }
     } catch (error) {
       console.error("Error signing out:", error);
       Alert.alert("Error", "Failed to sign out.");
+    } finally {
+      setLoading(false); // 🔴 Stop loading state
     }
   };
 
@@ -67,22 +96,29 @@ export default function MenuScreen() {
       <View style={styles.container}>
         <View style={styles.profileContainer}>
           <View style={styles.profileImage}>
-            <FontAwesome 
-              name="user" 
-              size={50} 
-              color="#1E73E8" 
-              style={{ textAlign: "center" }} 
+            <FontAwesome
+              name="user"
+              size={50}
+              color="#1E73E8"
+              style={{ textAlign: "center" }}
             />
           </View>
           <Text style={styles.profileName}>{username}</Text>
-          <Text style={styles.profileRole}>{rollno} </Text>
+          <Text style={styles.profileRole}>{rollno}</Text>
         </View>
 
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-            <Text style={styles.buttonText}>Sign Out</Text>
+          <TouchableOpacity
+            style={[styles.button, loading && styles.disabledButton]} // 🔴 Disable button when loading
+            onPress={handleSignOut}
+            disabled={loading} // 🔴 Prevent multiple clicks
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="white" /> // 🔴 Show loader
+            ) : (
+              <Text style={styles.buttonText}>Sign Out</Text>
+            )}
           </TouchableOpacity>
-
         </View>
       </View>
     </View>
@@ -142,4 +178,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
+  disabledButton: {
+    backgroundColor: "#A0C3FF", // Lighter shade to indicate disabled state
+  },
 });
+

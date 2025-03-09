@@ -318,12 +318,12 @@ userRouter.get("/attendance-checker",async function(req,res){
         if(student){
             res.send({
                 msg:"You have already been marked",
-                notmarked:false
+                marked:true
             })
         }
         else{
             res.send({
-                notmarked:true
+                marked:false
             })
         }
 
@@ -401,10 +401,11 @@ userRouter.post('/signout',async function(req,res){
         const clas=await CurrentclassModel.findOne({
             Batch:batch,
         })
+        console.log("helloooooooooo");
         if(clas){
             
             res.send({
-                msg:"class is going on cant signout",
+                msg:"Class is going,You cannot Signout",
                 ongoing:true
             })
         }

@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, SafeAreaView, ActivityIndicator, Alert, Touchab
 import React, { useState } from 'react';
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { useFocusEffect } from '@react-navigation/native';
-import Header from "../../components/Fheader";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +14,8 @@ export default function CurrentClass() {
     const [classDetails, setClassDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { batch, title } = useLocalSearchParams();
+    const [stoppingClass, setStoppingClass] = useState(false);  // New state
+    const { title } = useLocalSearchParams();
 
     const now = new Date();
     const formattedDate = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getFullYear()).slice(-2)}`;
@@ -62,6 +62,7 @@ export default function CurrentClass() {
     );
 
     const handleStopClass = async () => {
+        setStoppingClass(true); // Start loading state
         try {
             const token = await getToken();
             if (!token) return;
@@ -73,11 +74,13 @@ export default function CurrentClass() {
             Alert.alert('Class Stopped', response.data.msg);
             router.push({
                 pathname: "/pages/today-attendance",
-                params: { batch, title },
+                params: { title },
             });
         } catch (err) {
             console.error('Error stopping class:', err);
             Alert.alert('Error', err.response?.data?.message || "Failed to stop the class");
+        } finally {
+            setStoppingClass(false); // Stop loading state
         }
     };
 
@@ -126,8 +129,16 @@ export default function CurrentClass() {
                             <Text style={styles.value}>{classDetails.Hours || "N/A"}</Text>
                         </View>
 
-                        <TouchableOpacity onPress={handleStopClass} style={styles.courseCard}>
-                            <Text style={styles.courseName}>Stop Class</Text>
+                        <TouchableOpacity 
+                            onPress={handleStopClass} 
+                            style={[styles.courseCard, stoppingClass && { backgroundColor: '#555' }]} 
+                            disabled={stoppingClass} // Disable button when loading
+                        >
+                            {stoppingClass ? (
+                                <ActivityIndicator size="small" color="white" />
+                            ) : (
+                                <Text style={styles.courseName}>Stop Class</Text>
+                            )}
                         </TouchableOpacity>
                     </View>
                 </>
@@ -172,6 +183,7 @@ const styles = StyleSheet.create({
         width: '90%',
         borderWidth: 1,
         borderColor: '#00509E',
+        alignItems: 'center',
     },
     courseName: {
         fontSize: 18,

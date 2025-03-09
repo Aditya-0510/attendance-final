@@ -23,7 +23,8 @@ const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 export default function StudentTable() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { batch, title } = useLocalSearchParams();
+  const {title } = useLocalSearchParams();
+  const [batch, setBatch] = useState(null);
   // console.log(coursecode);
 
   const getToken = async () => {
@@ -35,10 +36,25 @@ export default function StudentTable() {
     }
   };
 
+  const getStoredData = async () => {
+    try {
+      const storedBatch = await AsyncStorage.getItem("selectedBatch");
+      console.log("storedbatch"+storedBatch);
+      setBatch(storedBatch);
+    } catch (error) {
+      console.error("Error retrieving stored data:", error);
+    }
+  };
+
+  useEffect(()=>{
+    getStoredData()
+  },[])
+
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
+        await getStoredData();
         const token = await getToken();
         if (!token) {
           Alert.alert("Error", "Authentication token missing.");
@@ -72,7 +88,7 @@ export default function StudentTable() {
     };
 
     fetchStudents();
-  }, []);
+  }, [batch]);
 
   const exportToCSV = async () => {
     if (students.length === 0) {
