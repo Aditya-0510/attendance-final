@@ -294,7 +294,32 @@ userRouter.get('/total-attendance',async function(req,res){
         })
     }
 })
+userRouter.get("/attendance-checker",async function(req,res){
+    const userid=req.user.id;
+    try{
+        const student=await MarkedModel.findOne({
+            studentid:userid
+        })
+        if(student){
+            res.send({
+                msg:"You have already been marked",
+                notmarked:false
+            })
+        }
+        else{
+            res.send({
+                notmarked:true
+            })
+        }
 
+    }
+    catch(e){
+        res.status(500).send({
+            msg:"Internal server error"
+        })
+    }
+
+})
 userRouter.post('/mark-attendance',async function(req,res){
     let coursecode=req.body.coursecode;
     let hour=req.body.hour;
@@ -364,12 +389,21 @@ userRouter.post('/signout',async function(req,res){
         if(clas){
             
             res.send({
-                msg:"breached you are marked absent"
+                msg:"class is going on cant signout",
+                ongoing:true
+            })
+        }
+        else{
+            res.send({
+                msg:"Signed out successfully",
+                ongoing:false
             })
         }
     }
         catch(e){
-
+            res.send({
+                msg:"Internal server error"
+            })
         }
 })
 module.exports={
