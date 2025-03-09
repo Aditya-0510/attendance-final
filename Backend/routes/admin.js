@@ -191,6 +191,7 @@ adminRouter.post("/forget-admin",async function(req,res){
 adminRouter.post("/signin",async function(req,res){
     const email=req.body.email;
     const password=req.body.password;
+    
     try{
     const admin=await AdminModel.findOne({ // will return nothing or the user but if find is used then it will return [] or the array of the user.
         email:email
@@ -230,7 +231,7 @@ adminRouter.use(auth_admin);
 adminRouter.get("/present",async function(req,res){
     const batch=req.query.batch;
     
-    console.log(batch);
+    console.log(batch+"hello");
     try{
         let attendance=[];
         const user=await UserModel.find({
