@@ -8,7 +8,6 @@ const {AdminModel,CourseModel, CurrentclassModel, AttendanceModel, UserModel, Ma
 
 
 const nodemailer = require('nodemailer');
-const admin = require('../middlewares/admin');
 
 const otpStore = new Map(); // Store email -> OTP pairs temporarily
 
@@ -27,6 +26,10 @@ adminRouter.post('/signup', async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
+    const admin=await AdminModel.findOne({
+        email:email
+    })
+    if(!admin){
     const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
 
     // Store user data against the OTP
@@ -40,6 +43,12 @@ adminRouter.post('/signup', async (req, res) => {
     });
 
     res.send({ msg: 'OTP sent to email. Please verify.' });
+}
+else{
+    res.send({
+        msg:"faculty already exists"
+    })
+}
   } catch (err) {
     res.status(500).send({ msg: 'Failed to send OTP' });
   }

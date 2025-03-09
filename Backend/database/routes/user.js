@@ -24,6 +24,10 @@ userRouter.post('/signup', async (req, res) => {
   const { email, password, name, roll, batch } = req.body;
 
   try {
+    const user=await UserModel.findOne({
+        email:email
+    })
+    if(!user){
     const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
 
     // Store user data against the OTP
@@ -37,6 +41,12 @@ userRouter.post('/signup', async (req, res) => {
     });
 
     res.send({ msg: 'OTP sent to email. Please verify.' });
+}
+else{
+    res.send({
+        msg:"User already exists "
+    })
+}
   } catch (err) {
     res.status(500).send({ msg: 'Failed to send OTP' });
   }
