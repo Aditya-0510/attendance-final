@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import Color from '../../constant/Color';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function SignIn() {
    const router = useRouter();
@@ -18,7 +21,7 @@ export default function SignIn() {
       setIsLoading(true);
 
       try {
-         const response = await axios.post('http://10.0.8.75:5000/admin/signin', SignInData, {});
+         const response = await axios.post(`${API_URL}/admin/signin`, SignInData, {});
          Alert.alert(response.data.msg);
 
          const success = response.data.success;

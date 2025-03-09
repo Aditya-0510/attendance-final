@@ -16,6 +16,9 @@ import {
 import { useRouter, Stack } from "expo-router";
 import Color from "../../constant/Color";
 import axios from "axios";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function FacultySignUpScreen() {
   const router = useRouter();
@@ -61,7 +64,7 @@ export default function FacultySignUpScreen() {
 
     try {
       const response = await axios.post(
-        "http://10.0.8.75:5000/admin/signup",
+        `${API_URL}/admin/signup`,
         SignUpData
       );
 

@@ -12,6 +12,9 @@ import axios from "axios";
 import { useRouter, Stack } from "expo-router";
 import Header from "../../components/Fheader";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function CourseList() {
   const router = useRouter();
@@ -39,7 +42,7 @@ export default function CourseList() {
         return;
       }
 
-      const response = await axios.get("http://10.0.8.75:5000/admin/courses", {
+      const response = await axios.get(`${API_URL}/admin/courses`, {
         headers: {
           token: token,
         },

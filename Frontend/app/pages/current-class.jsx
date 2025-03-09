@@ -1,24 +1,24 @@
 import { StyleSheet, Text, View, SafeAreaView, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useRouter,useLocalSearchParams,Stack} from "expo-router";
+import React, { useState } from 'react';
+import { useRouter, useLocalSearchParams, Stack } from "expo-router";
+import { useFocusEffect } from '@react-navigation/native';
 import Header from "../../components/Fheader";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Ionicons } from "@expo/vector-icons";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function CurrentClass() {
     const router = useRouter();
     const [classDetails, setClassDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { batch,title } = useLocalSearchParams();
+    const { batch, title } = useLocalSearchParams();
 
     const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-        const year = String(now.getFullYear()).slice(-2); // Get last 2 digits of year
-        const formattedDate = `${day}-${month}-${year}`;
-
+    const formattedDate = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getFullYear()).slice(-2)}`;
 
     const getToken = async () => {
         try {
@@ -38,7 +38,7 @@ export default function CurrentClass() {
             const token = await getToken();
             if (!token) return;
 
-            const response = await axios.get("http://10.0.8.75:5000/admin/checker", {
+            const response = await axios.get(`${API_URL}/admin/checker`, {
                 headers: { 'token': token },
             });
 
@@ -55,24 +55,26 @@ export default function CurrentClass() {
         }
     };
 
-    useEffect(() => {
-        fetchClassDetails();
-    }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchClassDetails();
+        }, [])
+    );
 
     const handleStopClass = async () => {
         try {
             const token = await getToken();
             if (!token) return;
 
-            const response = await axios.delete("http://10.0.8.75:5000/admin/end-class", {
+            const response = await axios.delete(`${API_URL}/admin/end-class`, {
                 headers: { 'token': token },
             });
 
             Alert.alert('Class Stopped', response.data.msg);
             router.push({
                 pathname: "/pages/today-attendance",
-                params: { batch: batch,title,title},
-             });
+                params: { batch, title },
+            });
         } catch (err) {
             console.error('Error stopping class:', err);
             Alert.alert('Error', err.response?.data?.message || "Failed to stop the class");
@@ -82,60 +84,57 @@ export default function CurrentClass() {
     if (loading) {
         return (
             <SafeAreaView style={styles.container}>
-                {/* <Header /> */}
                 <ActivityIndicator size="large" color="#007bff" style={styles.loader} />
             </SafeAreaView>
         );
     }
 
     return (
-        // <>
-            <SafeAreaView style={styles.container}>
-                <Stack.Screen
-                            options={{
-                               headerShown: true,
-                               animation: "slide_from_right",
-                               headerLeft: () => (
-                                <TouchableOpacity
-                                  onPress={() => router.replace('(faculty)')}
-                                  style={{ marginLeft: 15 }}
-                                >
-                                  <Ionicons name="arrow-back" size={24} color="black" />
-                                </TouchableOpacity>
-                              ),
-                            }}
-                         />
-                {error ? (
-                    <Text style={styles.errorText}>{error}</Text>
-                ) : classDetails ? (
-                    <>
-                        <Text style={styles.title}>Class is in Progress !!</Text>
-                        <View style={styles.detailContainer}>
-                            <View style={styles.detailRow}>
-                                <Text style={styles.label}>Course:</Text>
-                                <Text style={styles.value}>{classDetails.Title || "N/A"}</Text>
-                            </View>
-
-                            <View style={styles.detailRow}>
-                                <Text style={styles.label}>Date:</Text>
-                                <Text style={styles.value}>{formattedDate || "N/A"}</Text>
-                            </View>
-
-                            <View style={styles.detailRow}>
-                                <Text style={styles.label}>Hours:</Text>
-                                <Text style={styles.value}>{classDetails.Hours || "N/A"}</Text>
-                            </View>
-
-                            <TouchableOpacity onPress={handleStopClass} style={styles.courseCard}>
-                                <Text style={styles.courseName}>Stop Class</Text>
-                            </TouchableOpacity>
+        <SafeAreaView style={styles.container}>
+            <Stack.Screen
+                options={{
+                    headerShown: true,
+                    animation: "slide_from_right",
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => router.replace('(faculty)')}
+                            style={{ marginLeft: 15 }}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+            {error ? (
+                <Text style={styles.errorText}>{error}</Text>
+            ) : classDetails ? (
+                <>
+                    <Text style={styles.title}>Class is in Progress !!</Text>
+                    <View style={styles.detailContainer}>
+                        <View style={styles.detailRow}>
+                            <Text style={styles.label}>Course:</Text>
+                            <Text style={styles.value}>{classDetails.Title || "N/A"}</Text>
                         </View>
-                    </>
-                ) : (
-                    <Text style={styles.noClassText}>No ongoing class at the moment.</Text>
-                )}
-            </SafeAreaView>
-        // </>
+
+                        <View style={styles.detailRow}>
+                            <Text style={styles.label}>Date:</Text>
+                            <Text style={styles.value}>{formattedDate || "N/A"}</Text>
+                        </View>
+
+                        <View style={styles.detailRow}>
+                            <Text style={styles.label}>Hours:</Text>
+                            <Text style={styles.value}>{classDetails.Hours || "N/A"}</Text>
+                        </View>
+
+                        <TouchableOpacity onPress={handleStopClass} style={styles.courseCard}>
+                            <Text style={styles.courseName}>Stop Class</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            ) : (
+                <Text style={styles.noClassText}>No ongoing class at the moment.</Text>
+            )}
+        </SafeAreaView>
     );
 }
 

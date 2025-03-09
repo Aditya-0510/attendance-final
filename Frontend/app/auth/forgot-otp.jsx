@@ -12,6 +12,9 @@ import {
   import React, { useState } from "react";
   import Color from "../../constant/Color";
   import axios from "axios";
+  import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
   
   export default function Otp() {
     const router = useRouter();
@@ -33,7 +36,7 @@ import {
   
       try {
         const response = await axios.post(
-          "http://10.0.8.75:5000/user/forget-verify",
+          `${API_URL}/forget-verify`,
           SignInData,
           {}
         );

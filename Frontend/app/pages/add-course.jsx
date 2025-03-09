@@ -4,6 +4,9 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router'
 import Header from "../../components/Fheader"; 
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function AddCourse() {
       const router = useRouter()
@@ -33,7 +36,7 @@ export default function AddCourse() {
             
             console.log("hhfhfh")
             const response = await axios.post(
-                `http://10.0.8.75:5000/admin/add-course`,
+                `${API_URL}/admin/add-course`,
                 classDetails,
                 {
                     headers: {

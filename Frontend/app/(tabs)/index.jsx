@@ -3,6 +3,9 @@ import React,{useEffect,useState} from "react";
 import { useRouter} from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios'; 
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function index() {
     const router = useRouter();
@@ -24,7 +27,7 @@ export default function index() {
           return;
         }
   
-        const response = await axios.get("http://10.0.8.75:5000/user/profile", {
+        const response = await axios.get(`${API_URL}/user/profile`, {
           headers: { token }
         });
         console.log("data"+response.data.Name);

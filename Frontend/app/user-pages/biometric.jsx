@@ -4,7 +4,10 @@ import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter,Stack } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
-import Header from "../../components/header"; 
+import Header from "../../components/header";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL; 
 
 export default function Verification() {
   const [isBiometricSupported, setIsBiometricSupported] = useState(null);
@@ -34,7 +37,7 @@ export default function Verification() {
       }
       console.log("token"+token);
       const response = await axios.get(
-        'http://10.0.8.75:5000/user/checker',
+        `${API_URL}/user/checker`,
         {
             headers: {
                 'token': token,
@@ -168,7 +171,7 @@ export default function Verification() {
         console.log(newDetails);
 
         await axios.post(
-          'http://10.0.8.75:5000/user/mark-attendance',
+          `${API_URL}/user/mark-attendance`,
           newDetails,
           {
               headers: {

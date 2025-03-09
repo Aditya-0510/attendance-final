@@ -10,6 +10,9 @@ import {
   Alert,
 } from "react-native";
 import axios from "axios";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
@@ -45,7 +48,7 @@ export default function StudentTable() {
         }
 
         const response = await axios.get(
-          "http://10.0.8.75:5000/admin/get-all",
+          `${API_URL}/admin/get-all`,
           {
             headers: { token: token },
             params: { coursecode: coursecode },

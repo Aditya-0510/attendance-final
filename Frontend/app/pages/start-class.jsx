@@ -15,6 +15,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function ClassDetails() {
   const getToken = async () => {
@@ -52,7 +55,7 @@ export default function ClassDetails() {
           return;
         }
         const response = await axios.get(
-          "http://10.0.8.75:5000/admin/courses",
+          `${API_URL}/admin/courses`,
           {
             headers: { token: token },
           }
@@ -101,7 +104,7 @@ export default function ClassDetails() {
       console.log("Sending class data:", classData);
 
       const response = await axios.post(
-        "http://10.0.8.75:5000/admin/start-class",
+        `${API_URL}/admin/start-class`,
         classData,
         {
           headers: { token: token },

@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from "expo-router";
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function Index() {
     const router = useRouter();
@@ -27,7 +30,7 @@ export default function Index() {
                 return;
             }
 
-            const response = await axios.get("https://proxy-pakki.onrender.com/admin/profile", {
+            const response = await axios.get(`${API_URL}/admin/profile`, {
                 headers: { token }
             });
 
@@ -56,7 +59,7 @@ export default function Index() {
                 return;
             }
 
-            const response = await axios.get("http://10.0.8.75:5000/admin/checker", {
+            const response = await axios.get(`${API_URL}/admin/checker`, {
                 headers: { 'token': token },
             });
 

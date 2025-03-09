@@ -11,6 +11,9 @@ import { useRouter, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function Course() {
   const [courses, setCourses] = useState([]);
@@ -33,7 +36,7 @@ export default function Course() {
         return;
       }
 
-      const response = await axios.get("http://10.0.8.75:5000/courses/preview");
+      const response = await axios.get(`${API_URL}/courses/preview`);
       if (response.data) {
         setCourses(response.data);
       }

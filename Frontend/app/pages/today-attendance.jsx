@@ -16,6 +16,9 @@ import { useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Papa from "papaparse";
 import Header from "../../components/Fheader";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function StudentTable() {
   const [students, setStudents] = useState([]);
@@ -45,7 +48,7 @@ export default function StudentTable() {
 
         console.log(batch);
         const response = await axios.get(
-          "http://10.0.8.75:5000/admin/present",
+          `${API_URL}/admin/present`,
           {
             headers: { token: token },
             params: { batch: batch},

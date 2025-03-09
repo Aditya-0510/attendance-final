@@ -15,6 +15,10 @@ import { useRouter, Stack,useLocalSearchParams } from "expo-router";
 import Color from "../../constant/Color";
 import axios from "axios";
 import { Picker } from "@react-native-picker/picker";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
+
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -41,7 +45,7 @@ export default function SignUpScreen() {
 
     try {
       const response = await axios.post(
-        "http://10.0.8.75:5000/user/reset",
+        `${API_URL}/user/reset`,
         passwordData,
       );
 

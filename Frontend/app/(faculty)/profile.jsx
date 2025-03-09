@@ -4,6 +4,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import axios from 'axios';
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function MenuScreen() {
   const [username, setUsername] = useState("Guest");
@@ -28,7 +31,7 @@ export default function MenuScreen() {
         return;
       }
 
-      const response = await axios.get("https://proxy-pakki.onrender.com/admin/profile", {
+      const response = await axios.get(`${API_URL}/admin/profile`, {
         headers: { token }
       });
       console.log("data"+response.data.Name);

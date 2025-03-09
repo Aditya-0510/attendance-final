@@ -8,6 +8,9 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import Svg, { G, Circle } from 'react-native-svg';
 import { Ionicons } from "@expo/vector-icons";
+import Constants from 'expo-constants';
+
+const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 
 export default function Attendance() {
   const router = useRouter();
@@ -34,7 +37,7 @@ export default function Attendance() {
         return;
       }
 
-      const response = await axios.get('http://10.0.8.75:5000/user/total-attendance', {
+      const response = await axios.get(`${API_URL}/user/total-attendance`, {
         headers: { token: token },
         params: { Coursecode: coursecode },
       });
