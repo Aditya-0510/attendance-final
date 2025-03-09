@@ -27,7 +27,7 @@ export default function Index() {
                 return;
             }
 
-            const response = await axios.get("http://10.0.8.75:5000/admin/profile", {
+            const response = await axios.get("https://proxy-pakki.onrender.com/admin/profile", {
                 headers: { token }
             });
 

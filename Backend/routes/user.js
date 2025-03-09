@@ -6,7 +6,7 @@ require('dotenv').config();
 const {auth_user}=require('../middlewares/user')
 const {UserModel, CourseModel,AttendanceModel, CurrentclassModel,MarkedModel}=require("../db");
 const nodemailer = require('nodemailer');
-
+const cors=require('cors');
 const otpStore = new Map(); // Store email -> OTP pairs temporarily
 
 // Configure nodemailer (use your email service credentials)
@@ -19,6 +19,11 @@ const transporter = nodemailer.createTransport({
 });
 
 
+const cors = require('cors');
+
+userRouter.use(cors({
+    origin: 'https://proxy-pakki.onrender.com', // Allow only this origin
+}));
 
 userRouter.post('/signup', async (req, res) => {
   const { email, password, name, roll, batch } = req.body;

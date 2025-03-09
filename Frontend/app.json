@@ -39,6 +39,7 @@
       "typedRoutes": true
     },
     "extra": {
+      "API_URL": "https://proxy-pakki.onrender.com",
       "router": {
         "origin": false
       },

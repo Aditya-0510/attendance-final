@@ -4,6 +4,13 @@
 const {Router}=require('express'); // both are same but this is oneliner to import
 const {CourseModel}=require('../db')
 const courseRouter=Router();
+const cors=require('cors');
+const cors = require('cors');
+
+courseRouter.use(cors({
+    origin: 'https://proxy-pakki.onrender.com', // Allow only this origin
+}));
+
 courseRouter.get("/preview",async function(req,res){
     console.log("hiii")
     try{

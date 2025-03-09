@@ -6,7 +6,10 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "API_URL": "https://proxy-pakki.onrender.com"
+      }
     },
     "preview": {
       "distribution": "internal"

@@ -1,5 +1,7 @@
 const jwt=require('jsonwebtoken');
+const cors=require('cors');
 require('dotenv').config();
+
 function auth(req,res,next){
     let token=req.headers.token;
     console.log(token)

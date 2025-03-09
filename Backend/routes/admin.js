@@ -3,6 +3,7 @@ const adminRouter=Router();
 const bcrypt=require('bcrypt')
 const jwt=require('jsonwebtoken');
 const {auth_admin}=require('../middlewares/admin')
+const cors=require('cors')
 require('dotenv').config();
 const {AdminModel,CourseModel, CurrentclassModel, AttendanceModel, UserModel, MarkedModel}=require("../db");
 
@@ -20,6 +21,11 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+const cors = require('cors');
+
+adminRouter.use(cors({
+    origin: 'https://proxy-pakki.onrender.com', // Allow only this origin
+}));
 
 
 adminRouter.post('/signup', async (req, res) => {

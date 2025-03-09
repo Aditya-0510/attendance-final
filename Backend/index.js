@@ -1,6 +1,7 @@
 const express=require('express');
 const jwt=require('jsonwebtoken');
 const bcrypt=require('bcrypt');
+const cors=require('cors')
 require('dotenv').config();
 // const {createUserRoutes}=require('./routes/user');
 // const {createCourseRoutes}=require('./routes/courses')
@@ -15,6 +16,11 @@ const {CourseModel}=require('./db')
 
 const app = express();
 app.use(express.json());
+const cors = require('cors');
+
+app.use(cors({
+    origin: 'https://proxy-pakki.onrender.com', // Allow only this origin
+}));
 
 app.use('/user',userRouter);
 app.use('/courses',courseRouter); // better convention or way to route the requests 
