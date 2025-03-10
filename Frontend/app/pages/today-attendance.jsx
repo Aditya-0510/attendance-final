@@ -23,8 +23,9 @@ const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
 export default function StudentTable() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const {title } = useLocalSearchParams();
+  // const {title } = useLocalSearchParams();
   const [batch, setBatch] = useState(null);
+  const [title, setTitle] = useState(null);
   // console.log(coursecode);
 
   const getToken = async () => {
@@ -39,8 +40,10 @@ export default function StudentTable() {
   const getStoredData = async () => {
     try {
       const storedBatch = await AsyncStorage.getItem("selectedBatch");
+      const storesTitle = await AsyncStorage.getItem("selectedTitle");
       console.log("storedbatch"+storedBatch);
       setBatch(storedBatch);
+      setTitle(storesTitle)
     } catch (error) {
       console.error("Error retrieving stored data:", error);
     }
@@ -66,7 +69,7 @@ export default function StudentTable() {
           `${API_URL}/admin/present`,
           {
             headers: { 'token': token },
-            params: { 'batch': batch},
+            params: { 'batch': batch,'title':title},
           }
         );
 

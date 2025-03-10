@@ -142,16 +142,26 @@ export default function ClassDetails() {
     }
   };
 
+  const storeTitle = async (title) => {
+    try {
+      await AsyncStorage.setItem("selectedTitle", title);
+      console.log(title);
+    } catch (error) {
+      console.error("Error storing title:", error);
+    }
+  };
+
   const renderCourseItem = ({ item }) => {
     console.log("Course item clicked:", item); // Debug log
     return (
       <TouchableOpacity
         style={styles.modalItem}
-        onPress={() => {
+        onPress={async() => {
           setSelectedCourse({
             name: `${item.coursecode || "N/A"} - ${item.title || "N/A"}`,
             id: item.coursecode || "N/A", // Ensure coursecode is set for API call
           });
+          await storeTitle(item.title)
           setCourseModalVisible(false);
         }}
       >
