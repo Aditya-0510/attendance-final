@@ -273,21 +273,58 @@ adminRouter.get("/present",async function(req,res){
             else{
                 let email=user[i].email;
                 let name=user[i].Name;
-                // await transporter.sendMail({
-                //     from: 'proxypakki@gmail.com',
-                //     to: email,
-                //     subject: 'Attendance Alert - Missed Class Notification',
-                //     html: `
-                //       <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #333;">
-                //         <h2>Dear ${name},</h2>
-                //         <p>Looks like you missed <strong>${title}</strong> class! If this is news to you and you're certain you were present, we're sorry — you feel that way. Apps can make mistakes, but ProxyPakki doesn't.</p>
-                        
-                //         <p>However, if you're convinced otherwise, you may report this discrepancy to the respective faculty. Just make sure you have a solid alibi!</p>
+                await transporter.sendMail({
+                    from: 'proxypakki@gmail.com',
+                    to: email,
+                    subject: 'Attendance Alert - Missed Class Notification',
+                    html: `
+                      <html>
+                        <head>
+                          <style>
+                            body {
+                              font-family: Arial, sans-serif;
+                              padding: 20px;
+                              background-color: #f4f4f4;
+                              color: #333;
+                              line-height: 1.6;
+                            }
+                            .email-container {
+                              max-width: 600px;
+                              background-color: #fff;
+                              margin: 0 auto;
+                              padding: 30px;
+                              border-radius: 10px;
+                              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                            }
+                            h2 {
+                              color: #D9534F;
+                            }
+                            p {
+                              font-size: 16px;
+                            }
+                            .footer {
+                              margin-top: 20px;
+                              font-size: 14px;
+                              color: #777;
+                            }
+                          </style>
+                        </head>
+                        <body>
+                          <div class="email-container">
+                            <h2>Dear ${name},</h2>
+                            <p>Looks like you missed your <strong>${title}</strong> class! 📚</p>
+                            <p>If this is news to you and you're certain you were present, we're sorry — you feel that way. Apps can make mistakes, but <strong>ProxyPakki</strong> doesn't. 😏</p>
+                            <p>However, if you're convinced otherwise, you may report this discrepancy to the respective faculty. Just make sure you have a solid alibi! 🕵️‍♂️</p>
+                            <div class="footer">
+                              Best regards,<br>
+                              <strong>ProxyPakki Team</strong>
+                            </div>
+                          </div>
+                        </body>
+                      </html>
+                    `
+                  });
                   
-                //         <p>Best regards,<br><strong>ProxyPakki</strong></p>
-                //       </div>
-                //     `
-                //   });
                   
                 attendance.push({
                     rollno:user[i].rollno,
@@ -419,25 +456,62 @@ adminRouter.post('/start-class',async function(req,res){
       const user=await UserModel.find({
         Batch:batch
     })
-    // for(let i=0;i<user.length;i++){
-    //     name=user[i].Name;
-    //     email=user[i].email;
-    //     await transporter.sendMail({
-    //         from: 'proxypakki@gmail.com',
-    //         to: email,
-    //         subject: "Class in Session - Don't Miss Out!",
-    //         html: `
-    //           <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #333;">
-    //             <h2>Dear ${name},</h2>
-    //             <p>Your <strong>${title}</strong> class has just begun! Head over to the <strong>ProxyPakki</strong> app and mark your presence. Your attendance definitely matters — not so sure about your attention. 😉</p>
-          
-    //             <p>See you in class!</p>
-          
-    //             <p>Best regards,<br><strong>ProxyPakki</strong></p>
-    //           </div>
-    //         `
-    //       });
-    // }
+    for(let i=0;i<user.length;i++){
+        name=user[i].Name;
+        email=user[i].email;
+        await transporter.sendMail({
+  from: 'proxypakki@gmail.com',
+  to: email,
+  subject: "Class in Session - Don't Miss Out!",
+  html: `
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+          }
+          .email-container {
+            max-width: 600px;
+            background-color: #fff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          }
+          h2 {
+            color: #4A47A3;
+          }
+          p {
+            font-size: 16px;
+          }
+          .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <h2>Dear ${name},</h2>
+          <p>Your <strong>${title}</strong> class has just begun! 📚</p>
+          <p>Head over to the <strong>ProxyPakki</strong> app and mark your presence. Your attendance definitely matters — not so sure about your attention. 😉</p>
+          <p>See you in class!</p>
+          <div class="footer">
+            Best regards,<br>
+            <strong>ProxyPakki Team</strong>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+});
+
+}
     res.send({
         msg:"Class has been raised",
         success:true
