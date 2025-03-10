@@ -394,6 +394,8 @@ adminRouter.post('/start-class',async function(req,res){
     const adminId=req.admin.id;
     console.log(hours);
     try{
+        
+
         await CurrentclassModel.create({
             Coursecode:coursecode,
             Hours:hours,
@@ -412,6 +414,28 @@ adminRouter.post('/start-class',async function(req,res){
         { coursecode: coursecode }, // Find by coursecode
         { $set: { total_hours: thour } } // Use $set to update the field
       );
+      const user=await UserModel.find({
+        Batch:batch
+    })
+    for(let i=0;i<user.length;i++){
+        name=user[i].Name;
+        email=user[i].email;
+        await transporter.sendMail({
+            from: 'proxypakki@gmail.com',
+            to: email,
+            subject: "Class in Session - Don't Miss Out!",
+            html: `
+              <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #333;">
+                <h2>Dear ${name},</h2>
+                <p>Your <strong>${title}</strong> class has just begun! Head over to the <strong>ProxyPakki</strong> app and mark your presence. Your attendance definitely matters — not so sure about your attention. 😉</p>
+          
+                <p>See you in class!</p>
+          
+                <p>Best regards,<br><strong>ProxyPakki</strong></p>
+              </div>
+            `
+          });
+    }
     res.send({
         msg:"Class has been raised",
         success:true
