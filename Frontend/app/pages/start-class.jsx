@@ -41,6 +41,7 @@ export default function ClassDetails() {
   const [selectedBatch, setBatch] = useState("Batch");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [startingClass, setStartingClass] = useState(false);
   const [error, setError] = useState(null);
 
   const hours = ["1 - Tutorial", "1.5 - Class", "2 - Lab"];
@@ -89,6 +90,7 @@ export default function ClassDetails() {
     }
 
     try {
+      setStartingClass(true); // Show loading indicator
       const token = await getToken();
       if (!token) {
         Alert.alert("Error", "Authentication token missing.");
@@ -130,6 +132,8 @@ export default function ClassDetails() {
         "Error",
         error.response?.data?.message || "Network error. Please try again."
       );
+    } finally {
+      setStartingClass(false); // Hide loading indicator
     }
   };
 
@@ -253,9 +257,17 @@ export default function ClassDetails() {
         </TouchableOpacity>
 
         {/* Start Button */}
-        <TouchableOpacity style={styles.startButton} onPress={handleStartClass}>
+        <TouchableOpacity
+        style={styles.startButton}
+        onPress={handleStartClass}
+        disabled={startingClass} // Disable button while loading
+      >
+        {startingClass ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
           <Text style={styles.startButtonText}>Start </Text>
-        </TouchableOpacity>
+        )}
+      </TouchableOpacity>
 
         {/* Course Modal */}
         <Modal

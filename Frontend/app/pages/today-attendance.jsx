@@ -140,7 +140,7 @@ export default function StudentTable() {
         {loading ? (
           <ActivityIndicator size="large" color="#007bff" />
         ) : students.length === 0 ? (
-          <Text style={styles.noDataText}>No students found.</Text>
+          <Text style={styles.noDataText}>Loading.....</Text>
         ) : (
           <View>
             <View style={styles.table}>
