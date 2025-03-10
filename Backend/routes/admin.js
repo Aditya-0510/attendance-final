@@ -249,7 +249,7 @@ adminRouter.use(auth_admin);
 
 adminRouter.get("/present",async function(req,res){
     const batch=req.query.batch;
-    
+    const title=req.query.title
     console.log(batch+"hello");
     try{
         let attendance=[];
@@ -262,12 +262,31 @@ adminRouter.get("/present",async function(req,res){
                 studentid:userId,
             })
             if(student){
+                
                 attendance.push({
                     rollno:user[i].rollno,
                     attendance:"Present"
                 })
             }
             else{
+                let email=user[i].email;
+                let name=user[i].Name;
+                await transporter.sendMail({
+                    from: 'proxypakki@gmail.com',
+                    to: email,
+                    subject: 'Attendance Alert - Missed Class Notification',
+                    html: `
+                      <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; color: #333;">
+                        <h2>Dear ${name},</h2>
+                        <p>Looks like you missed <strong>${title}</strong> class! If this is news to you and you're certain you were present, we're sorry — you feel that way. Apps can make mistakes, but ProxyPakki doesn't.</p>
+                        
+                        <p>However, if you're convinced otherwise, you may report this discrepancy to the respective faculty. Just make sure you have a solid alibi!</p>
+                  
+                        <p>Best regards,<br><strong>ProxyPakki</strong></p>
+                      </div>
+                    `
+                  });
+                  
                 attendance.push({
                     rollno:user[i].rollno,
                     attendance:"Absent"
