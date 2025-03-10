@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "proxy-pakki",
-    "slug": "proxy-pakki",
+    "name": "attendance",
+    "slug": "attendance",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo-new-edited.jpg",
+    "icon": "./assets/images/logo-new-edited.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -28,7 +28,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/logo-new-edited.jpg",
+          "image": "./assets/images/logo-new-edited.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#D0C8F2"

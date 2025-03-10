@@ -40,10 +40,10 @@ export default function StudentTable() {
   const getStoredData = async () => {
     try {
       const storedBatch = await AsyncStorage.getItem("selectedBatch");
-      const storesTitle = await AsyncStorage.getItem("selectedTitle");
+      const storedTitle = await AsyncStorage.getItem("selectedTitle");
       console.log("storedbatch"+storedBatch);
       setBatch(storedBatch);
-      setTitle(storesTitle)
+      setTitle(storedTitle)
     } catch (error) {
       console.error("Error retrieving stored data:", error);
     }
