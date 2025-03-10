@@ -39,11 +39,17 @@ userRouter.post('/signup', async (req, res) => {
     otpStore.set(otp, { email, password, name, roll, batch });
 
     await transporter.sendMail({
-      from: 'proxypakki@gmail.com',
-      to: email,
-      subject: 'Email Verification OTP',
-      text: `Your OTP for email verification is: ${otp}`
-    });
+        from: 'proxypakki@gmail.com',
+        to: email,
+        subject: 'Email Verification OTP',
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2>Email Verification</h2>
+            <p>Your OTP for email verification is:</p>
+            <p style="font-size: 24px; font-weight: bold; color: #333;">${otp}</p>
+          </div>
+        `
+      });
 
     res.send({ msg: 'OTP sent to email. Please verify.' });
 }
@@ -109,11 +115,17 @@ userRouter.post('/verify-otp', async (req, res) => {
                     
                 
                     await transporter.sendMail({
-                      from: 'proxypakki@gmail.com',
-                      to: email,
-                      subject: 'Email Verification OTP',
-                      text: `Your OTP for email verification is: ${otp}`
-                    });
+                        from: 'proxypakki@gmail.com',
+                        to: email,
+                        subject: 'Email Verification OTP',
+                        html: `
+                          <div style="font-family: Arial, sans-serif; padding: 20px;">
+                            <h2>Email Verification</h2>
+                            <p>Your OTP for email verification is:</p>
+                            <p style="font-size: 24px; font-weight: bold; color: #333;">${otp}</p>
+                          </div>
+                        `
+                      });
                 
                     res.send({ msg: 'OTP sent to email. Please verify.' ,done:true});
                   } catch (err) {
