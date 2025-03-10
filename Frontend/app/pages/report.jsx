@@ -81,7 +81,8 @@ export default function StudentTable() {
     }
 
     // Convert student data to CSV format
-    const csvData = Papa.unparse(
+    let csvData = `Course: ${title}\n`;
+      csvData += Papa.unparse(
       students.map((student) => ({
         "Roll Number": student.rollno,
         Percentage: student.percentage.toFixed(2) + "%",

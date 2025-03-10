@@ -250,6 +250,8 @@ adminRouter.use(auth_admin);
 adminRouter.get("/present",async function(req,res){
     const batch=req.query.batch;
     const title=req.query.title
+
+    console.log("title"+title);
     console.log(batch+"hello");
     try{
         let attendance=[];

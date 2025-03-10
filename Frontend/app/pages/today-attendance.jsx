@@ -65,6 +65,7 @@ export default function StudentTable() {
         }
 
         console.log(batch);
+        console.log("title"+title);
         const response = await axios.get(
           `${API_URL}/admin/present`,
           {
@@ -98,8 +99,12 @@ export default function StudentTable() {
       return;
     }
 
+    const now = new Date();
+    const formattedDate = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getFullYear()).slice(-2)}`;
     // Convert student data to CSV format
-    const csvData = Papa.unparse(
+    let csvData = `Course: ${title}\n`;
+    csvData += `Date: ${formattedDate}\n`;
+    csvData += Papa.unparse(
       students.map((student) => ({
         "Roll Number": student.rollno,
         Attendance: student.attendance,
