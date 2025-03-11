@@ -4,7 +4,7 @@
     "slug": "attendance",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo-edited.png",
+    "icon": "./assets/images/logo-new-edited.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,8 +13,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo-edited.png",
-        "backgroundColor": "#D0C8F2"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
       },
       "package": "com.saiaditya10.attendance"
     },
@@ -28,7 +28,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/logo-edited.png",
+          "image": "./assets/images/logo-new-edited.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#D0C8F2"
