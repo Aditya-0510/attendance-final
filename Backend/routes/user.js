@@ -59,7 +59,7 @@ else{
     })
 }
   } catch (err) {
-    res.status(500).send({ msg: 'Failed to send OTP' });
+    res.status(500).send({ msg: 'Failed to send OTP' +err});
   }
 });
 
