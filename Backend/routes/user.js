@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'proxypakki@gmail.com',
-    pass: 'mifs gbfw sfzu awfm'
+    pass: 'rrtr uzwn ybme gkal'
   }
 });
 
@@ -129,7 +129,7 @@ userRouter.post('/verify-otp', async (req, res) => {
                 
                     res.send({ msg: 'OTP sent to email. Please verify.' ,done:true});
                   } catch (err) {
-                    res.status(500).send({ msg: 'Failed to send OTP' });
+                    res.status(500).send({ msg: 'Failed to send OTP' +err});
                   }
             }
         }
