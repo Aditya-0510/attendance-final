@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, TouchableOpacity, Alert, Animated, Easing } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import { useRouter, Stack } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Ionicons } from "@expo/vector-icons";
 import Constants from 'expo-constants';
 import axios from 'axios';
@@ -15,7 +15,6 @@ export default function Attendance() {
   const { coursecode, title } = useLocalSearchParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const animatedValue = useRef(new Animated.Value(0)).current;
 
   const getToken = async () => {
     try {
@@ -43,17 +42,11 @@ export default function Attendance() {
 
       if (response.data && response.data.length > 0) {
         setData(response.data[0]); // Access the first item in the array
-        // Animate the circular progress
-        Animated.timing(animatedValue, {
-          toValue: response.data[0].percentage / 100,
-          duration: 1000,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: false
-        }).start();
       } else {
         setData(null);
       }
     } catch (error) {
+      console.error('Error fetching attendance data:', error);
       setData(null);
     }
     finally {
@@ -65,17 +58,14 @@ export default function Attendance() {
     fetchData();
   }, []);
 
-  // Custom Circular Progress Component using View instead of SVG
-  const CircularProgressComponent = ({ percentage }) => {
+  // Simple Pie Chart Component
+  const PieChart = ({ percentage }) => {
     const circleSize = 180;
     const displayedPercentage = Math.round(percentage);
     
-    // Calculate the rotation angle for the progress arc
-    const progressAngle = animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '360deg']
-    });
-
+    // Calculate angle in degrees for the attended portion (green)
+    const attendedAngle = 3.6 * percentage; // 3.6 = 360/100
+    
     return (
       <>
       <Stack.Screen
@@ -99,37 +89,52 @@ export default function Attendance() {
           ),
         }}
       />
-      <View style={styles.circularProgressContainer}>
-        {/* Create the static red background circle */}
-        <View style={[styles.circle, { width: circleSize, height: circleSize }]}>
-          <View style={[styles.progressBackground, { borderColor: '#F44336' }]} />
+      <View style={styles.pieChartContainer}>
+        <View style={[styles.pieChart, { width: circleSize, height: circleSize }]}>
+          {/* Missed portion (red) - full circle by default */}
+          <View style={[styles.pieSlice, { backgroundColor: '#F44336' }]} />
           
-          {/* Animated green progress arc */}
-          <Animated.View 
+          {/* Attended portion (green) - overlays based on percentage */}
+          <View 
             style={[
-              styles.progressOverlay,
-              {
-                borderColor: '#4CAF50',
+              styles.pieSlice, 
+              { 
+                backgroundColor: '#4CAF50',
+                // Create a conical gradient effect using a rotated element with overflow
                 transform: [
-                  { rotate: '-90deg' }, // Start from the top
-                  { rotateZ: progressAngle }
-                ]
+                  { rotate: `${attendedAngle}deg` }
+                ],
+                // Hide the overflow portion using a clipping mask
+                borderTopRightRadius: percentage >= 50 ? 0 : circleSize,
+                borderBottomRightRadius: percentage >= 50 ? 0 : circleSize,
+                // Only show right half of the circle
+                right: percentage <= 50 ? '50%' : 0,
+                width: percentage <= 50 ? '50%' : '100%',
               }
             ]} 
           />
           
-          {/* Animated progress indicator dot */}
-          <Animated.View 
-            style={[
-              styles.progressIndicator,
-              {
-                transform: [
-                  { rotate: progressAngle },
-                  { translateX: circleSize / 2 - 10 }
-                ]
-              }
-            ]} 
-          />
+          {/* If percentage > 50%, we need a second green piece for the left half */}
+          {percentage > 50 && (
+            <View 
+              style={[
+                styles.pieSlice, 
+                { 
+                  backgroundColor: '#4CAF50',
+                  // For the left half, we rotate it differently
+                  transform: [
+                    { rotate: `${attendedAngle - 180}deg` }
+                  ],
+                  // Only show left half
+                  left: '50%',
+                  width: '50%',
+                  // Clip as needed
+                  borderTopLeftRadius: circleSize,
+                  borderBottomLeftRadius: circleSize,
+                }
+              ]} 
+            />
+          )}
           
           {/* Inner white circle with percentage text */}
           <View style={[styles.innerCircle, { width: circleSize - 40, height: circleSize - 40 }]}>
@@ -149,7 +154,7 @@ export default function Attendance() {
         <Text style={styles.loadingText}>Loading attendance data...</Text>
       ) : data && data.totalhours > 0 ? (
         <>
-          <CircularProgressComponent percentage={data.percentage} />
+          <PieChart percentage={data.percentage} />
           
           <View style={styles.legendContainer}>
             <View style={styles.legendItem}>
@@ -201,51 +206,30 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  circularProgressContainer: {
+  pieChartContainer: {
     alignItems: 'center', 
     justifyContent: 'center',
     marginBottom: 20,
   },
-  circle: {
+  pieChart: {
+    position: 'relative',
+    borderRadius: 1000,
+    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
   },
-  progressBackground: {
+  pieSlice: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     borderRadius: 1000,
-    borderWidth: 20,
-    borderColor: '#F44336', // Missed color (red)
-  },
-  progressOverlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    borderRadius: 1000,
-    borderWidth: 20,
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: '#4CAF50', // Attended color (green)
-    transform: [{ rotate: '-90deg' }],
-  },
-  progressIndicator: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#4CAF50',
-    position: 'absolute',
-    top: 0,
-    left: '50%',
-    marginLeft: -10,
   },
   innerCircle: {
     backgroundColor: 'white',
     borderRadius: 1000,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 10,
   },
   percentageText: {
     fontSize: 24,
