@@ -238,7 +238,7 @@ adminRouter.post("/signin",async function(req,res){
     }
 }
 catch(e){
-    res.status(500).send({
+   return res.status(500).send({
         msg:"internal server error"
     })
 }
