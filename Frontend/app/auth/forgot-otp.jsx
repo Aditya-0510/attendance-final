@@ -36,7 +36,7 @@ const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL;
   
       try {
         const response = await axios.post(
-          `${API_URL}/forget-verify`,
+          `${API_URL}/user/forget-verify`,
           SignInData,
           {}
         );
