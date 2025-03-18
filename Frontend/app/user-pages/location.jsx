@@ -20,19 +20,19 @@ export default function AuthScreen() {
   const locationSubscription = useRef(null);
 
   // Define boundary
-  // const BOUNDARY = {
-  //   corner1: { lat: 15.4007844, lng: 75.0258996 },
-  //   corner2: { lat: 15.4002653, lng: 75.015831 },
-  //   corner3: { lat: 15.38971, lng: 75.0167238 },
-  //   corner4: { lat: 15.3856518, lng: 75.0246933 },
-  // };
-  // Define boundary
   const BOUNDARY = {
-    corner1: { lat: 15.3928349, lng: 75.0251171 },
-    corner2: { lat: 15.3927314, lng: 75.0251674 },
-    corner3: { lat: 15.3927683, lng: 75.0252418 },
-    corner4: { lat: 15.3928711, lng: 75.0251902 },
-  }; 
+    corner1: { lat: 15.4007844, lng: 75.0258996 },
+    corner2: { lat: 15.4002653, lng: 75.015831 },
+    corner3: { lat: 15.38971, lng: 75.0167238 },
+    corner4: { lat: 15.3856518, lng: 75.0246933 },
+  };
+  // Define boundary
+  // const BOUNDARY = {
+  //   corner1: { lat: 15.3928349, lng: 75.0251171 },
+  //   corner2: { lat: 15.3927314, lng: 75.0251674 },
+  //   corner3: { lat: 15.3927683, lng: 75.0252418 },
+  //   corner4: { lat: 15.3928711, lng: 75.0251902 },
+  // }; 
   // Function to check if inside boundary
   const isInsideBoundary = useCallback((latitude, longitude) => {
     const minLat = Math.min(

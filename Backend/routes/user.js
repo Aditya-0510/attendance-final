@@ -323,13 +323,18 @@ userRouter.get('/total-attendance',async function(req,res){
 })
 userRouter.get("/attendance-checker",async function(req,res){
     const userid=req.user.id;
+    const ip=req.query.ip;
+    console.log(ip+"        "+"gfdcjgvkhcgffffhvjvkgcfxdfcghvjvgcxdfchvjcgxdcvjcfhxhdfgchvj");
     try{
-        const student=await MarkedModel.findOne({
-            studentid:userid
+        const student = await MarkedModel.findOne({
+            $or: [
+                { studentid: userid },
+                {ip:ip}
+            ]
         })
         if(student){
             res.send({
-                msg:"You have already been marked",
+                msg:"You have already marked one attendance",
                 marked:true
             })
         }
@@ -352,7 +357,9 @@ userRouter.post('/mark-attendance',async function(req,res){
     let hour=req.body.hour;
     let user=req.user.id;
     let ispresent=req.body.ispresent;
+    let ip=req.body.ip;
     console.log(hour);
+    console.lo
     try{
         let course=await CourseModel.findOne({
             coursecode:coursecode
@@ -386,6 +393,7 @@ userRouter.post('/mark-attendance',async function(req,res){
             coursecode:id,
             ispresent:ispresent,
             studentid:user,
+            ip:ip
 
       })
         res.send({

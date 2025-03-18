@@ -21,6 +21,7 @@ const marked=new Schema({
     coursecode:ObjectId,
     ispresent:Boolean,
     studentid:ObjectId,
+    ip:String
 })
 
 const admin= new Schema({

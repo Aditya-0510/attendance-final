@@ -5,6 +5,7 @@ import { useRouter, Stack } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
+import * as Application from 'expo-application';
 
 const API_URL = Constants.expoConfig?.extra?.API_URL || process.env.API_URL; 
 
@@ -15,6 +16,97 @@ export default function Verification() {
   const [showRecordedMessage, setShowRecordedMessage] = useState(false);
   const [classDetails, setClassDetails] = useState(null);
   const router = useRouter();
+  const [ipAddress, setIpAddress] = useState(null);
+  const [authMethod, setAuthMethod] = useState('biometric'); // 'biometric' or 'device'
+
+// Add this function to fetch the IP
+// const fetchUserIP = async () => {
+//   try {
+//     // Using ipify API to get the user's public IP address
+//     const response = await axios.get('https://api.ipify.org?format=json');
+//     const userIP = response.data.ip;
+//     console.log('User IP:', userIP);
+//     setIpAddress(userIP);
+//     return userIP;
+//   } catch (error) {
+//     console.error('Error fetching IP address:', error);
+//     return null;
+//   }
+// };
+const getDeviceId = async () => {
+  try {
+    // First, try to retrieve a previously stored ID
+    const storedId = await AsyncStorage.getItem('permanentDeviceId');
+    if (storedId) {
+      console.log('Using stored permanent device ID:', storedId);
+      setIpAddress(storedId);
+      return storedId;
+    }
+
+    // Generate device fingerprint from multiple sources
+    const deviceFingerprint = generateDeviceFingerprint();
+    
+    // Store the fingerprint for future use
+    await AsyncStorage.setItem('permanentDeviceId', deviceFingerprint);
+    console.log('Generated and stored permanent device ID:', deviceFingerprint);
+    
+    // Set in state and return
+    setIpAddress(deviceFingerprint);
+    return deviceFingerprint;
+  } catch (error) {
+    console.error('Error generating device ID:', error);
+    // If all fails, generate a temporary ID
+    const tempId = `temp-${Date.now()}`;
+    setIpAddress(tempId);
+    return tempId;
+  }
+};
+
+// Generate a consistent fingerprint based on device characteristics
+const generateDeviceFingerprint = () => {
+  // Collect all available device information
+  const deviceInfo = {
+    // Expo Constants
+    installationId: Constants.installationId || '',
+    deviceId: Constants.deviceId || '',
+    deviceName: Constants.deviceName || '',
+    deviceYearClass: Constants.deviceYearClass?.toString() || '',
+    
+    // Platform specific
+    os: Platform.OS,
+    version: Platform.Version?.toString() || '',
+    brand: Platform.OS === 'android' ? (Platform.constants?.Brand || '') : '',
+    model: Platform.OS === 'android' ? (Platform.constants?.Model || '') : '',
+    
+    // Screen dimensions (if needed)
+    screenWidth: Dimensions.get('window').width.toString(),
+    screenHeight: Dimensions.get('window').height.toString(),
+    screenScale: Dimensions.get('window').scale.toString(),
+  };
+  
+  // Create a string from all these properties
+  let fingerprint = '';
+  for (const [key, value] of Object.entries(deviceInfo)) {
+    if (value && typeof value === 'string') {
+      fingerprint += value;
+    }
+  }
+  
+  // Create a hash from the string
+  // Simple hash function
+  const hash = str => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    // Convert to positive hex string
+    return Math.abs(hash).toString(16);
+  };
+  
+  return `device-${hash(fingerprint)}`;
+};
 
   const getToken = async () => {
     try {
@@ -52,6 +144,7 @@ export default function Verification() {
 
   useEffect(() => {
     fetchDetails();
+    getDeviceId(); // Fetch the IP address when component mounts
   }, []);
 
   useEffect(() => {
@@ -60,38 +153,29 @@ export default function Verification() {
 
   const checkAuthenticationSupport = async () => {
     try {
-      if (Platform.OS === 'ios') {
-        // For iOS, we'll check if device authentication is available
-        const compatible = await LocalAuthentication.hasHardwareAsync();
-        console.log('Authentication hardware available:', compatible);
-        
-        // Set authentication as supported regardless of biometric availability
-        // since we want to use passcode
+      // Check if device has biometric hardware
+      const hasBiometricHardware = await LocalAuthentication.hasHardwareAsync();
+      console.log('Biometric hardware available:', hasBiometricHardware);
+      
+      // Check if device has biometrics enrolled
+      const hasBiometricsEnrolled = await LocalAuthentication.isEnrolledAsync();
+      console.log('Biometrics enrolled:', hasBiometricsEnrolled);
+      
+      // Check what authentication types are available
+      const supportedAuthTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      console.log('Supported auth types:', supportedAuthTypes);
+      
+      // Check if any authentication is available (including passcode)
+      const secureAuthAvailable = await LocalAuthentication.isEnrolledAsync();
+      
+      if (hasBiometricHardware && hasBiometricsEnrolled) {
+        // Biometric is available and enrolled
+        setAuthMethod('biometric');
         setIsAuthenticationSupported(true);
       } else {
-        // For Android, we'll still use biometric authentication
-        const compatible = await LocalAuthentication.hasHardwareAsync();
-        console.log('Biometric hardware available:', compatible);
-        
-        if (!compatible) {
-          setIsAuthenticationSupported(false);
-          Alert.alert('Error', 'Biometric hardware not available');
-          return;
-        }
-
-        const enrolled = await LocalAuthentication.isEnrolledAsync();
-        console.log('Biometrics enrolled:', enrolled);
-        
-        if (!enrolled) {
-          setIsAuthenticationSupported(false);
-          Alert.alert(
-            'Biometric Authentication Not Set Up', 
-            'Please set up fingerprint or face recognition in your device settings to use this feature.',
-            [{ text: 'OK' }]
-          );
-          return;
-        }
-
+        // Fall back to device authentication (passcode/pattern/pin)
+        console.log('Falling back to device authentication');
+        setAuthMethod('device');
         setIsAuthenticationSupported(true);
       }
     } catch (error) {
@@ -105,30 +189,15 @@ export default function Verification() {
     if (isVerificationComplete) return;
     
     try {
-      let authOptions;
-      
-      if (Platform.OS === 'ios') {
-        // iOS-specific options to use device passcode
-        authOptions = {
-          promptMessage: 'Enter your passcode to verify attendance',
-          disableDeviceFallback: false,
-          fallbackLabel: '',
-          cancelLabel: 'Cancel',
-          // Enable device credentials (passcode)
-          deviceCredentialAllowed: true
-        };
-      } else {
-        // Android-specific options
-        authOptions = {
-          promptMessage: 'Authenticate to verify attendance',
-          disableDeviceFallback: true,
-          cancelLabel: "Cancel",
-          fallbackLabel: '',
-          requireConfirmation: false,
-          sensitiveTransaction: true,
-          allowDeviceCredentials: false
-        };
-      }
+      // Set up authentication options based on available methods
+      const authOptions = {
+        promptMessage: 'Authenticate to verify attendance',
+        cancelLabel: "Cancel",
+        disableDeviceFallback: false,
+        fallbackLabel: 'Use passcode instead',
+        // Always allow device credentials as fallback
+        deviceCredentialAllowed: true
+      };
       
       console.log('Starting authentication with options:', authOptions);
       const result = await LocalAuthentication.authenticateAsync(authOptions);
@@ -140,15 +209,28 @@ export default function Verification() {
             Alert.alert('Error', 'Authentication token missing.');
             return;
         }
+        
         if (!classDetails) {
             Alert.alert('Error', 'Class details not available.');
             return;
         }
         
+        // Ensure IP address is available
+        let deviceId = ipAddress;
+      if (!deviceId) {
+        deviceId = await getDeviceId();
+      }
+        
+      if (!deviceId) {
+        Alert.alert('Error', 'Could not determine your device ID.');
+        return;
+      }
+        
         const newDetails = {
           coursecode: classDetails.Coursecode,
           hour: classDetails.Hours,
           ispresent: result.success,
+          ip: deviceId
         };
         
         console.log(newDetails);
@@ -205,7 +287,7 @@ export default function Verification() {
         resizeMode="contain" 
       />
       <Text style={styles.title}>
-        {Platform.OS === 'ios' ? 'Passcode Authentication' : 'Biometric Authentication'}
+        {authMethod === 'biometric' ? 'Biometric Authentication' : 'Device Authentication'}
       </Text>
       
       {showRecordedMessage ? (
@@ -218,24 +300,22 @@ export default function Verification() {
       ) : isAuthenticationSupported ? (
         <View>
           <Text style={styles.text}>
-            {Platform.OS === 'ios' 
-              ? 'Please authenticate using your device passcode'
-              : 'Please authenticate using your biometrics'}
+            {authMethod === 'biometric' 
+              ? 'Please authenticate using your biometrics'
+              : 'Please authenticate using your device passcode/pattern'}
           </Text>
           <TouchableOpacity 
             style={styles.button} 
             onPress={authenticateUser}
           >
             <Text style={styles.buttonText}>
-              {Platform.OS === 'ios' ? 'Use Passcode' : 'Authenticate'}
+              {authMethod === 'biometric' ? 'Use Biometrics' : 'Use Device Authentication'}
             </Text>
           </TouchableOpacity>
         </View>
       ) : (
         <Text style={styles.text}>
-          {Platform.OS === 'ios' 
-            ? "Authentication is not available on this device."
-            : "Biometric authentication is not available on this device."}
+          Authentication is not available on this device.
         </Text>
       )}
       
