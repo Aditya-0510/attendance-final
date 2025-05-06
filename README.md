@@ -1,6 +1,6 @@
 # Welcome to Proxypakki
 
-Contrary to what the name might suggest, Proxypakki is a highly secure and robust attendance recording and tracking application. It's not just reliable—it's flexible, efficient, and user-friendly.
+Contrary to what the name might suggest, Proxypakki is a highly secure and robust attendance recording and tracking application. It's not just reliable —> it's flexible, efficient, and user-friendly.
 
 Using biometric verification, geo-fencing, and other advanced methods, Proxypakki ensures that proxy attendance is virtually impossible. The app also boasts an intuitive UI, a well-structured backend, and seamless data flow.
 
