@@ -100,6 +100,7 @@ This section allows the instructor to define courses for the current semester. T
 ---
 
 Now that you're familiar with Proxypakki's robust feature set, it’s time to try it out for yourself. 
+Made **with** love ❤️❤️ and **for** credits 🪙.
 
 
 ## Get started
